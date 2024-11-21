@@ -6,6 +6,18 @@
 
 char* getExecutableName();
 
+/**
+ * Get size of the embedded data
+ *
+ * see Documentation/EXECUTABLE_STRUCTURE.md
+ *
+ * Args:
+ *    exe_name: Executable's name or NULL for automatic resolution
+ *
+ * Returns:
+ *    Embedded data size
+ */
+uint32_t getEmbeddedDataSize(char* exe_name);
 uint32_t getExecutableSize();
 
 
