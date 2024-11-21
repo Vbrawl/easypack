@@ -15,7 +15,10 @@ int main() {
   }
 
   uint32_t exe_size = getExecutableSize();
-  printf("Size: %u", exe_size);
+  printf("Executable Size: %u\n", exe_size);
+
+  uint32_t data_size = getEmbeddedDataSize(NULL);
+  printf("Data Size: %u\n", data_size);
 
   return 0;
 }
