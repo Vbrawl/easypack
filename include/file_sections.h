@@ -21,5 +21,8 @@ uint32_t getEmbeddedDataSize(char* exe_name);
 uint32_t getExecutableSize();
 
 
+char* getEmbeddedData(char* exe_name);
+
+
 
 #endif

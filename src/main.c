@@ -20,5 +20,14 @@ int main() {
   uint32_t data_size = getEmbeddedDataSize(NULL);
   printf("Data Size: %u\n", data_size);
 
+  char* data = getEmbeddedData(NULL);
+  if(data == NULL) {
+    printf("Data: NULL\n");
+  }
+  else {
+    printf("Data: %s\n", data);
+    free(data);
+  }
+
   return 0;
 }
