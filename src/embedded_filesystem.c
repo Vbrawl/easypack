@@ -1,6 +1,12 @@
 #include "embedded_filesystem.h"
+#include "utils.h"
 #include <string.h>
 #include <stdlib.h>
+
+#include <sys/stat.h>
+#include <stdio.h>
+#include <errno.h>
+#include <libgen.h>
 
 
 struct fs* loadFileSystemFromData(char* data) {
@@ -16,8 +22,9 @@ struct fs* loadFileSystemFromData(char* data) {
     // Read filename
     memcpy(&item->fsize, data, sizeof(item->fsize));
     data += sizeof(item->fsize);
-    item->filename = malloc(sizeof(char) * item->fsize);
+    item->filename = malloc(sizeof(char) * item->fsize + 1);
     memcpy(item->filename, data, sizeof(char) * item->fsize);
+    item->filename[item->fsize] = '\0';
     data += item->fsize;
 
     // Read data
@@ -81,4 +88,36 @@ char* exportFileSystemAsData(struct fs *system, uint32_t size) {
   }
 
   return buf_backup;
+}
+
+void dumpFileSystem(struct fs *system, char* dir_name) {
+  int err = 0;
+  for(size_t i = 0; i < system->size; i++) {
+    struct fs_item *item = &system->files[i];
+
+    // copy filename
+    char *filename_copy_d = strdup(item->filename);
+
+    // this may edit filename_copy, it may also
+    // return a pointer inside of it or an array
+    // to a statically allocated array
+    char *dname = dirname(filename_copy_d);
+    size_t dname_size = strlen(dname);
+
+    // Create directory
+    err = 0;
+    if(dname_size > 0)
+      err = makedirs(dname, dname_size, 0777);
+    free(filename_copy_d);
+    if(err == -1) return;
+
+    // Write directory
+    FILE *f = fopen(item->filename, "wb");
+    size_t wbytes = fwrite(item->data, sizeof(char), item->dsize, f);
+    if(wbytes != item->dsize) {
+      printf("dumpFileSystem(): Couldn't write to file, wrote %ld/%d bytes.", wbytes, item->dsize);
+      return;
+    }
+    fclose(f);
+  }
 }

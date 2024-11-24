@@ -19,4 +19,5 @@ struct fs* loadFileSystemFromData(char* data);
 uint32_t calculateFileSystemAsDataLength(struct fs *system);
 char* exportFileSystemAsData(struct fs *system, uint32_t size);
 void unLoadFileSystem(struct fs *system);
+void dumpFileSystem(struct fs *system, char* dir_name);
 #endif

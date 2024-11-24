@@ -27,10 +27,10 @@ int main() {
     struct fs *system = malloc(sizeof(struct fs));
     system->size = 1;
     system->files = malloc(sizeof(struct fs_item));
-    system->files[0].filename = "Hello World";
-    system->files[0].fsize = 12;
+    system->files[0].filename = "awdd/awdf";
+    system->files[0].fsize = 9;
     system->files[0].data = "awd";
-    system->files[0].dsize = 4;
+    system->files[0].dsize = 3;
 
     uint32_t fake_size = calculateFileSystemAsDataLength(system);
     char* fake_data = exportFileSystemAsData(system, fake_size);
@@ -45,7 +45,7 @@ int main() {
     new_name[namesize + 3] = 'w';
     new_name[namesize + 4] = '\0';
 
-    setEmbeddedData(exe_name, new_name, fake_data, system->size);
+    setEmbeddedData(exe_name, new_name, fake_data, fake_size);
 
     free(new_name);
     free(system->files);
@@ -60,16 +60,7 @@ int main() {
 
   struct fs *system = loadFileSystemFromData(data);
 
-  printf("FS Items: %d\n", system->size);
-  for(uint32_t i = 0; i < system->size; i++) {
-    char* temp_data = malloc(system->files[i].fsize + 1);
-    memcpy(temp_data, system->files[i].filename, system->files[i].fsize);
-    data[system->files[i].fsize] = '\0';
-
-    printf("File %d: %s\n", system->files[i].fsize, temp_data);
-
-    free(temp_data);
-  }
+  dumpFileSystem(system, "awd");
 
   unLoadFileSystem(system);
   free(data);
