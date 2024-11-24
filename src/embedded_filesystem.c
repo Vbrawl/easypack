@@ -92,11 +92,19 @@ char* exportFileSystemAsData(struct fs *system, uint32_t size) {
 
 void dumpFileSystem(struct fs *system, char* dir_name) {
   int err = 0;
+  size_t dir_name_size = strlen(dir_name);
   for(size_t i = 0; i < system->size; i++) {
     struct fs_item *item = &system->files[i];
 
-    // copy filename
-    char *filename_copy_d = strdup(item->filename);
+    // Combine filename with dir_name
+    char *final_filename = malloc(sizeof(char) * (dir_name_size + 1 + item->fsize + 1));
+    memcpy(final_filename, dir_name, dir_name_size);
+    final_filename[dir_name_size] = '/';
+    memcpy(final_filename + 1 + dir_name_size, item->filename, item->fsize);
+    final_filename[dir_name_size + 1 + item->fsize + 1] = '\0';
+
+    // Create copy
+    char *filename_copy_d = strdup(final_filename);
 
     // this may edit filename_copy, it may also
     // return a pointer inside of it or an array
@@ -109,10 +117,14 @@ void dumpFileSystem(struct fs *system, char* dir_name) {
     if(dname_size > 0)
       err = makedirs(dname, dname_size, 0777);
     free(filename_copy_d);
-    if(err == -1) return;
+    if(err == -1) {
+      free(final_filename);
+      return;
+    }
 
-    // Write directory
-    FILE *f = fopen(item->filename, "wb");
+    // Write file
+    FILE *f = fopen(final_filename, "wb");
+    free(final_filename);
     size_t wbytes = fwrite(item->data, sizeof(char), item->dsize, f);
     if(wbytes != item->dsize) {
       printf("dumpFileSystem(): Couldn't write to file, wrote %ld/%d bytes.", wbytes, item->dsize);
