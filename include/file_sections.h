@@ -23,6 +23,7 @@ uint32_t getExecutableSize();
 
 char* getEmbeddedData(char* exe_name);
 
+void setEmbeddedData(char* exe_name, char* new_exe_name, char* data, uint32_t dsize);
 
 
 #endif
