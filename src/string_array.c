@@ -9,7 +9,7 @@ char* sarray_getString(struct sarray *this, size_t index) {
 
   for(size_t i = 0; i < index; i++) {
     size_t offset = strlen(cursor);
-    cursor += offset;
+    cursor += offset + 1;
   }
 
   return cursor;
@@ -27,11 +27,13 @@ int sarray_extendBy(struct sarray *this, size_t additional_size) {
 int sarray_addString(struct sarray *this, char *string, size_t string_size) {
   size_t old_buf_size = this->buf_size;
 
-  int err = sarray_extendBy(this, string_size);
+  int err = sarray_extendBy(this, string_size + 1);
   if(err != 0) return err;
 
   memcpy(this->values + old_buf_size, string, string_size);
-  this->values[this->buf_size] = '\0';
+  this->values[this->buf_size - 1] = '\0';
+
+  this->count++;
   return 0;
 }
 

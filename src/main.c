@@ -3,6 +3,9 @@
 #include "embedded_filesystem.h"
 #include <stdlib.h>
 #include <string.h>
+#include <stdint.h>
+#include "utils.h"
+#include "string_array.h"
 
 
 int main() {
@@ -24,18 +27,15 @@ int main() {
     printf("Data: NULL\n");
     printf("Adding fake data!\n");
 
-    struct fs *system = malloc(sizeof(struct fs));
-    system->size = 1;
-    system->files = malloc(sizeof(struct fs_item));
-    system->files[0].filename = "awdd/awdf";
-    system->files[0].fsize = 9;
-    system->files[0].data = "awd";
-    system->files[0].dsize = 3;
+    const char *root = "awd";
+    struct fs *system = loadFileSystem(root);
+    //if(system == NULL) {
+    // TODO: Handle error
+    //}
+    uint32_t system_size = calculateFileSystemAsDataLength(system);
+    char *system_data = exportFileSystemAsData(system, system_size);
 
-    uint32_t fake_size = calculateFileSystemAsDataLength(system);
-    char* fake_data = exportFileSystemAsData(system, fake_size);
-    printf("%s\n", fake_data);
-
+    // process new filename
     size_t namesize = strlen(exe_name);
     char* new_name = malloc(namesize + 5);
     memcpy(new_name, exe_name, strlen(exe_name));
@@ -45,12 +45,11 @@ int main() {
     new_name[namesize + 3] = 'w';
     new_name[namesize + 4] = '\0';
 
-    setEmbeddedData(exe_name, new_name, fake_data, fake_size);
+    // set embedded data
+    setEmbeddedData(exe_name, new_name, system_data, system_size);
 
     free(new_name);
-    free(system->files);
-    free(system);
-    free(fake_data);
+    unLoadFileSystem(system);
     free(exe_name);
     return 0;
   }
@@ -60,7 +59,7 @@ int main() {
 
   struct fs *system = loadFileSystemFromData(data);
 
-  dumpFileSystem(system, "awd");
+  dumpFileSystem(system, "dumped");
 
   unLoadFileSystem(system);
   free(data);

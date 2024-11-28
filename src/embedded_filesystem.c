@@ -7,6 +7,8 @@
 #include <stdio.h>
 #include <errno.h>
 #include <libgen.h>
+#include <limits.h>
+#include <dirent.h>
 
 
 struct fs* loadFileSystemFromData(char* data) {
@@ -97,11 +99,12 @@ void dumpFileSystem(struct fs *system, char* dir_name) {
     struct fs_item *item = &system->files[i];
 
     // Combine filename with dir_name
-    char *final_filename = malloc(sizeof(char) * (dir_name_size + 1 + item->fsize + 1));
-    memcpy(final_filename, dir_name, dir_name_size);
-    final_filename[dir_name_size] = '/';
-    memcpy(final_filename + 1 + dir_name_size, item->filename, item->fsize);
-    final_filename[dir_name_size + 1 + item->fsize + 1] = '\0';
+    char *final_filename = NULL;//malloc(sizeof(char) * (dir_name_size + 1 + item->fsize + 1));
+    pathJoin(dir_name, item->filename, &final_filename);
+    //memcpy(final_filename, dir_name, dir_name_size);
+    //final_filename[dir_name_size] = '/';
+    //memcpy(final_filename + 1 + dir_name_size, item->filename, item->fsize);
+    //final_filename[dir_name_size + 1 + item->fsize + 1] = '\0';
 
     // Create copy
     char *filename_copy_d = strdup(final_filename);
@@ -132,4 +135,97 @@ void dumpFileSystem(struct fs *system, char* dir_name) {
     }
     fclose(f);
   }
+}
+
+
+struct fs* loadFileSystem(const char* dir_name) {
+  int err = 0;
+  size_t i = 0, rbytes = 0;
+  struct sarray files = {0};
+  struct stat fileinfo = {0};
+  const char *filename = NULL;
+  char *data = NULL;
+  FILE *f = NULL;
+  struct fs *system = malloc(sizeof(struct fs));
+  system->size = 0;
+  system->files = NULL;
+
+  walkDirectory(dir_name, &files);
+  if(files.count == 0) {
+    unLoadFileSystem(system);
+    sarray_clearAll(&files);
+    return NULL;
+  }
+
+  for(i = 0; i < files.count; i++) {
+    filename = sarray_getString(&files, i);
+    stat(filename, &fileinfo);
+
+    data = malloc(sizeof(char) * fileinfo.st_size);
+    if(data == NULL) {
+      perror("loadFileSystem()");
+      unLoadFileSystem(system);
+      sarray_clearAll(&files);
+      return NULL;
+    }
+
+    f = fopen(filename, "r");
+    if(f == NULL) {
+      perror("loadFileSystem()");
+      free(data);
+      unLoadFileSystem(system);
+      sarray_clearAll(&files);
+      return NULL;
+    }
+    rbytes = fread(data, sizeof(char), fileinfo.st_size, f);
+    fclose(f);
+
+    if(rbytes != fileinfo.st_size) {
+      printf("loadFileSystem(): Couldn't read whole file.\n");
+      free(data);
+      unLoadFileSystem(system);
+      sarray_clearAll(&files);
+      return NULL;
+    }
+
+    err = addFileToFileSystem(system, filename, data, fileinfo.st_size);
+    free(data);
+    if(err != 0) {
+      unLoadFileSystem(system);
+      sarray_clearAll(&files);
+      return NULL;
+    }
+  }
+
+  return system;
+}
+
+int addFileToFileSystem(struct fs *system, const char* filename, char* data, off_t dsize) {
+  if(dsize > UINT32_MAX || dsize < 0) {
+    printf("File can't be added, too big!\n");
+    return -1;
+  }
+  uint32_t dsize32 = (dsize & UINT32_MAX);
+
+  struct fs_item *temp_files = realloc(system->files, sizeof(struct fs_item) * (system->size + 1));
+  if(temp_files == NULL) {
+    perror("addFileToFileSystem()");
+    return -1;
+  }
+  system->files = temp_files;
+
+  struct fs_item *item = &system->files[system->size++];
+
+  // set fsize and filename
+  item->fsize = strlen(filename);
+  item->filename = malloc(item->fsize + 1);
+  memcpy(item->filename, filename, sizeof(char) * item->fsize);
+  item->filename[sizeof(char) * item->fsize] = '\0';
+
+  // set dsize and data
+  item->dsize = dsize;
+  item->data = malloc(sizeof(char) * item->dsize);
+  memcpy(item->data, data, sizeof(char) * item->dsize);
+
+  return 0;
 }

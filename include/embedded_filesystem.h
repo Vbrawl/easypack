@@ -2,6 +2,7 @@
 #define EASYPACK_EMBEDDED_FILESYSTEM_H
 
 #include <stdint.h>
+#include <sys/types.h>
 
 struct fs_item {
   char *filename;
@@ -20,4 +21,6 @@ uint32_t calculateFileSystemAsDataLength(struct fs *system);
 char* exportFileSystemAsData(struct fs *system, uint32_t size);
 void unLoadFileSystem(struct fs *system);
 void dumpFileSystem(struct fs *system, char* dir_name);
+struct fs* loadFileSystem(const char* dir_name);
+int addFileToFileSystem(struct fs *system, const char* filename, char* data, off_t dsize);
 #endif
