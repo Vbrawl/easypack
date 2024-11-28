@@ -11,54 +11,34 @@
 
 
 int createPackage(const char *root, const char *out) {
-  // Get a copy of CWD
-  char cwd[PATH_MAX];
-  if(getcwd(cwd, PATH_MAX) == NULL) {
-    perror("createPackage()");
-    return 1;
-  }
-
-  // Go to "root"
-  //if(chdir(root) != 0) {
-  //  perror("createPackage()");
-  //  return 2;
-  //}
+  char *exe_name = NULL, *system_data = NULL;
+  uint32_t exe_size = 0, system_size = 0;
+  struct fs *system = NULL;
 
   // Get executable's name ...
-  char *exe_name = getExecutableName();
-  if(exe_name == NULL) {
-    return 3;
-  }
+  if((exe_name = getExecutableName()) == NULL)
+    return 1;
 
-  // .. and size
-  uint32_t exe_size = getExecutableSize();
-  if(exe_size == 0) {
+  // ... and size
+  if((exe_size = getExecutableSize()) == 0) {
     free(exe_name);
-    return 4;
+    return 2;
   }
 
   // Add everything to memory
-  struct fs *system = loadFileSystem(root);
-  if(system == NULL) {
+  if((system = loadFileSystem(root)) == NULL) {
     free(exe_name);
-    return 5;
+    return 3;
   }
 
   // Extract required info from the system
-  uint32_t system_size = calculateFileSystemAsDataLength(system);
-  char *system_data = exportFileSystemAsData(system, system_size);
-  if(system_data == NULL) {
+  system_size = calculateFileSystemAsDataLength(system);
+  if((system_data = exportFileSystemAsData(system, system_size)) == NULL) {
     free(system_data);
+    unLoadFileSystem(system);
     free(exe_name);
-    return 6;
+    return 4;
   }
-
-  // Go back to real CWD
-  //if(chdir(cwd) != 0) {
-  //  perror("createPackage()");
-  //  free(exe_name);
-  //  return 7;
-  //}
 
   // Export the package
   setEmbeddedData(exe_name, out, system_data, system_size);
@@ -71,19 +51,22 @@ int createPackage(const char *root, const char *out) {
 }
 
 int main() {
+  uint32_t data_size = 0;
+  char *data = NULL;
+  const char *root = "awd";
+  const char *out_name = "easypack.new";
+  const char *out_dir = "dumped";
+  struct fs *system = NULL;
+
   uint32_t data_size = getEmbeddedDataSize(NULL);
   printf("Data Size: %u\n", data_size);
 
   if(data_size == 0) {
-    const char *root = "awd";
-    const char *out_name = "easypack.new";
     createPackage(root, out_name);
   }
   else {
-    char *data = getEmbeddedData(NULL);
-    struct fs *system = loadFileSystemFromData(data);
-
-    const char *out_dir = "dumped";
+    data = getEmbeddedData(NULL);
+    system = loadFileSystemFromData(data);
     dumpFileSystem(system, out_dir);
 
     unLoadFileSystem(system);
