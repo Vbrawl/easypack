@@ -50,27 +50,33 @@ int createPackage(const char *root, const char *out) {
   return 0;
 }
 
+int extractPackage(const char *out_dir) {
+  char *data = NULL;
+  struct fs *system = NULL;
+
+  data = getEmbeddedData(NULL);
+  system = loadFileSystemFromData(data);
+  dumpFileSystem(system, out_dir);
+
+  unLoadFileSystem(system);
+  free(data);
+  return 0;
+}
+
 int main() {
   uint32_t data_size = 0;
-  char *data = NULL;
   const char *root = "awd";
   const char *out_name = "easypack.new";
   const char *out_dir = "dumped";
-  struct fs *system = NULL;
 
-  uint32_t data_size = getEmbeddedDataSize(NULL);
+  data_size = getEmbeddedDataSize(NULL);
   printf("Data Size: %u\n", data_size);
 
   if(data_size == 0) {
     createPackage(root, out_name);
   }
   else {
-    data = getEmbeddedData(NULL);
-    system = loadFileSystemFromData(data);
-    dumpFileSystem(system, out_dir);
-
-    unLoadFileSystem(system);
-    free(data);
+    extractPackage(out_dir);
   }
 
   return 0;
