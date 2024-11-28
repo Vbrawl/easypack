@@ -12,23 +12,17 @@
 
 int createPackage(const char *root, const char *out) {
   char *exe_name = NULL, *system_data = NULL;
-  uint32_t exe_size = 0, system_size = 0;
+  uint32_t system_size = 0;
   struct fs *system = NULL;
 
   // Get executable's name ...
   if((exe_name = getExecutableName()) == NULL)
     return 1;
 
-  // ... and size
-  if((exe_size = getExecutableSize()) == 0) {
-    free(exe_name);
-    return 2;
-  }
-
   // Add everything to memory
   if((system = loadFileSystem(root)) == NULL) {
     free(exe_name);
-    return 3;
+    return 2;
   }
 
   // Extract required info from the system
@@ -37,7 +31,7 @@ int createPackage(const char *root, const char *out) {
     free(system_data);
     unLoadFileSystem(system);
     free(exe_name);
-    return 4;
+    return 3;
   }
 
   // Export the package
