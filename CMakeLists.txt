@@ -13,5 +13,5 @@ add_dependencies(easypack size_initializer)
 add_custom_command(
 	TARGET easypack POST_BUILD
 	COMMAND mkdir -p awd/dwa
-	COMMAND echo > awd/dwa/hi
+	COMMAND echo "Hello World" > awd/dwa/hi
 	COMMAND ./size_initializer easypack)
