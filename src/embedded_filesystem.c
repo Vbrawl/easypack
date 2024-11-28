@@ -99,12 +99,8 @@ void dumpFileSystem(struct fs *system, char* dir_name) {
     struct fs_item *item = &system->files[i];
 
     // Combine filename with dir_name
-    char *final_filename = NULL;//malloc(sizeof(char) * (dir_name_size + 1 + item->fsize + 1));
+    char *final_filename = NULL;
     pathJoin(dir_name, item->filename, &final_filename);
-    //memcpy(final_filename, dir_name, dir_name_size);
-    //final_filename[dir_name_size] = '/';
-    //memcpy(final_filename + 1 + dir_name_size, item->filename, item->fsize);
-    //final_filename[dir_name_size + 1 + item->fsize + 1] = '\0';
 
     // Create copy
     char *filename_copy_d = strdup(final_filename);
