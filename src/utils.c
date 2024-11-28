@@ -5,6 +5,7 @@
 #include <sys/types.h>
 #include <stdlib.h>
 #include <errno.h>
+#include <stdbool.h>
 
 
 int makedirs(char* path, size_t pathsize, mode_t mode) {
@@ -24,9 +25,11 @@ int makedirs(char* path, size_t pathsize, mode_t mode) {
   // Create component and recover slash
   for(size_t i = 0; i < components; i++) {
     if(mkdir(path, mode) == -1) {
-      if(errno == EEXIST) continue;
-      perror("makedirs()");
-      return -1;
+      bool throw_error = (errno != EEXIST);
+      if(throw_error) {
+        perror("makedirs()");
+        return -1;
+      }
     }
 
     size_t pathlen = strlen(path);
@@ -74,25 +77,39 @@ int listDirectory(const char* dirpath, struct sarray *arr, unsigned char type) {
 }
 
 int pathJoin(const char *p1, const char *p2, char **result) {
-  size_t result_size = snprintf(NULL, 0, "%s/%s", p1, p2);
+  size_t result_size = 0;
+
+  if(p1 == NULL && p2 == NULL) {
+    (*result) = NULL;
+    return -2;
+  }
+
+  if(p1 == NULL) result_size = strlen(p2);
+  else if(p2 == NULL) result_size = strlen(p1);
+  else result_size = snprintf(NULL, 0, "%s/%s", p1, p2);
+
   (*result) = malloc(result_size + 1);
   if(*result == NULL) {
     return -1;
   }
 
-  snprintf(*result, result_size + 1, "%s/%s", p1, p2);
+  if(p1 == NULL) memcpy(*result, p2, result_size);
+  else if(p2 == NULL) memcpy(*result, p1, result_size);
+  else snprintf(*result, result_size + 1, "%s/%s", p1, p2);
+
   (*result)[result_size] = '\0';
 
   return 0;
 }
 
-int walkDirectory(const char *root, struct sarray *arr) {
+int walkDirectory(const char *root, const char *vroot, struct sarray *arr) {
   /* Prepare and initialize variables */
   sarray_clearAll(arr); // Results array
   struct sarray filenames = {0}; // Temporarily store all filenames of root
   struct sarray nested_results = {0}; // Temporarily store all results of nested walkDirectory()
   char *filename = NULL; // Store each iteration's filename in the below loops
   char *result = NULL; // Store each iteration's fullpath in the below loops
+  char *vresult = NULL; // Store each iteration's virtual fullpath in the below loops
   size_t i = 0; // Iterator for loops
 
   /* List files in root */
@@ -101,9 +118,9 @@ int walkDirectory(const char *root, struct sarray *arr) {
   /* Add fullpath of files to "arr" string array */
   for(i = 0; i < filenames.count; i++) {
     filename = sarray_getString(&filenames, i);
-    pathJoin(root, filename, &result);
+    pathJoin(vroot, filename, &vresult);
 
-    sarray_addString(arr, result, strlen(result));
+    sarray_addString(arr, vresult, strlen(vresult));
 
     // Cleanup pathJoin's memory allocation
     free(result);
@@ -114,10 +131,11 @@ int walkDirectory(const char *root, struct sarray *arr) {
 
   for(i = 0; i < filenames.count; i++) {
     filename = sarray_getString(&filenames, i);
+    pathJoin(vroot, filename, &vresult);
     pathJoin(root, filename, &result);
 
     // Recursive call
-    walkDirectory(result, &nested_results);
+    walkDirectory(result, vresult, &nested_results);
 
     // Connect results together
     sarray_extendWith(arr, &nested_results);
@@ -125,6 +143,7 @@ int walkDirectory(const char *root, struct sarray *arr) {
     // Cleanup pathJoin's and walkDirectory's memory allocations
     sarray_clearAll(&nested_results);
     free(result);
+    free(vresult);
   }
 
   return 0;

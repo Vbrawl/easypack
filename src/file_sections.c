@@ -159,7 +159,7 @@ char* getEmbeddedData(char* exe_name) {
 }
 
 
-void setEmbeddedData(char* exe_name, char* new_exe_name, char* data, uint32_t dsize) {
+void setEmbeddedData(const char* exe_name, const char* new_exe_name, char* data, uint32_t dsize) {
   FILE *f = NULL;
   size_t wbytes = 0, rbytes = 0;
 

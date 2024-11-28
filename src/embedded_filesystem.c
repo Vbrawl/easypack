@@ -92,7 +92,7 @@ char* exportFileSystemAsData(struct fs *system, uint32_t size) {
   return buf_backup;
 }
 
-void dumpFileSystem(struct fs *system, char* dir_name) {
+void dumpFileSystem(struct fs *system, const char* dir_name) {
   int err = 0;
   size_t dir_name_size = strlen(dir_name);
   for(size_t i = 0; i < system->size; i++) {
@@ -124,12 +124,17 @@ void dumpFileSystem(struct fs *system, char* dir_name) {
     // Write file
     FILE *f = fopen(final_filename, "wb");
     free(final_filename);
+    if(f == NULL) {
+      perror("dumpFileSystem()");
+      return;
+    }
+
     size_t wbytes = fwrite(item->data, sizeof(char), item->dsize, f);
+    fclose(f);
     if(wbytes != item->dsize) {
       printf("dumpFileSystem(): Couldn't write to file, wrote %ld/%d bytes.", wbytes, item->dsize);
       return;
     }
-    fclose(f);
   }
 }
 
@@ -140,13 +145,14 @@ struct fs* loadFileSystem(const char* dir_name) {
   struct sarray files = {0};
   struct stat fileinfo = {0};
   const char *filename = NULL;
+  char *fullpath = NULL;
   char *data = NULL;
   FILE *f = NULL;
   struct fs *system = malloc(sizeof(struct fs));
   system->size = 0;
   system->files = NULL;
 
-  walkDirectory(dir_name, &files);
+  walkDirectory(dir_name, NULL, &files);
   if(files.count == 0) {
     unLoadFileSystem(system);
     sarray_clearAll(&files);
@@ -155,29 +161,34 @@ struct fs* loadFileSystem(const char* dir_name) {
 
   for(i = 0; i < files.count; i++) {
     filename = sarray_getString(&files, i);
-    stat(filename, &fileinfo);
+    pathJoin(dir_name, filename, &fullpath);
+    stat(fullpath, &fileinfo);
 
     data = malloc(sizeof(char) * fileinfo.st_size);
     if(data == NULL) {
       perror("loadFileSystem()");
+      free(fullpath);
       unLoadFileSystem(system);
       sarray_clearAll(&files);
       return NULL;
     }
 
-    f = fopen(filename, "r");
+    f = fopen(fullpath, "r");
     if(f == NULL) {
       perror("loadFileSystem()");
       free(data);
+      free(fullpath);
       unLoadFileSystem(system);
       sarray_clearAll(&files);
       return NULL;
     }
+    free(fullpath);
     rbytes = fread(data, sizeof(char), fileinfo.st_size, f);
     fclose(f);
 
     if(rbytes != fileinfo.st_size) {
       printf("loadFileSystem(): Couldn't read whole file.\n");
+      free(fullpath);
       free(data);
       unLoadFileSystem(system);
       sarray_clearAll(&files);
