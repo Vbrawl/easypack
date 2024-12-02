@@ -99,8 +99,8 @@ void dumpFileSystem(struct fs *system, const char* dir_name) {
     struct fs_item *item = &system->files[i];
 
     // Combine filename with dir_name
-    char *final_filename = NULL;
-    pathJoin(dir_name, item->filename, &final_filename);
+    char *final_filename = pathJoin(dir_name, item->filename);
+    if(final_filename == NULL) return;
 
     // Create copy
     char *filename_copy_d = strdup(final_filename);
@@ -161,7 +161,7 @@ struct fs* loadFileSystem(const char* dir_name) {
 
   for(i = 0; i < files.count; i++) {
     filename = sarray_getString(&files, i);
-    pathJoin(dir_name, filename, &fullpath);
+    fullpath = pathJoin(dir_name, filename);
     stat(fullpath, &fileinfo);
 
     data = malloc(sizeof(char) * fileinfo.st_size);

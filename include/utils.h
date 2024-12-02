@@ -28,7 +28,16 @@ int makedirs(const char *path, size_t pathsize, mode_t mode);
  * @retval -1 Failed
  */
 int listDirectory(const char *dirpath, struct sarray *arr, unsigned char type);
-int pathJoin(const char *p1, const char *p2, char **result);
+
+/**
+ * Join 2 paths together
+ *
+ * @param[in] p1        The first path
+ * @param[in] p2        The second path
+ *
+ * @returns A pointer to the result on success, NULL on failure.
+ */
+char* pathJoin(const char *p1, const char *p2);
 int walkDirectory(const char *root, const char *vroot, struct sarray *arr);
 
 #endif

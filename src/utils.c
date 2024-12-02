@@ -94,30 +94,29 @@ int listDirectory(const char* dirpath, struct sarray *arr, unsigned char type) {
   return 0;
 }
 
-int pathJoin(const char *p1, const char *p2, char **result) {
+char* pathJoin(const char *p1, const char *p2) {
+  char *result = NULL;
   size_t result_size = 0;
 
-  if(p1 == NULL && p2 == NULL) {
-    (*result) = NULL;
-    return -2;
-  }
+  // Return error if all paths are NULL
+  if(p1 == NULL && p2 == NULL) return NULL;
 
+  // Get expected size of the result (with optimizations)
   if(p1 == NULL) result_size = strlen(p2);
   else if(p2 == NULL) result_size = strlen(p1);
   else result_size = snprintf(NULL, 0, "%s/%s", p1, p2);
 
-  (*result) = malloc(result_size + 1);
-  if(*result == NULL) {
-    return -1;
-  }
+  // Allocate memory for result
+  result = malloc(result_size + 1);
+  if(result == NULL) return NULL;
 
-  if(p1 == NULL) memcpy(*result, p2, result_size);
-  else if(p2 == NULL) memcpy(*result, p1, result_size);
-  else snprintf(*result, result_size + 1, "%s/%s", p1, p2);
+  // Construct result's value
+  if(p1 == NULL) memcpy(result, p2, result_size);
+  else if(p2 == NULL) memcpy(result, p1, result_size);
+  else snprintf(result, result_size + 1, "%s/%s", p1, p2);
 
-  (*result)[result_size] = '\0';
-
-  return 0;
+  result[result_size] = '\0';
+  return result;
 }
 
 int walkDirectory(const char *root, const char *vroot, struct sarray *arr) {
@@ -136,12 +135,12 @@ int walkDirectory(const char *root, const char *vroot, struct sarray *arr) {
   /* Add fullpath of files to "arr" string array */
   for(i = 0; i < filenames.count; i++) {
     filename = sarray_getString(&filenames, i);
-    pathJoin(vroot, filename, &vresult);
+    vresult = pathJoin(vroot, filename);
 
     sarray_addString(arr, vresult, strlen(vresult));
 
     // Cleanup pathJoin's memory allocation
-    free(result);
+    free(vresult);
   }
 
   sarray_clearAll(&filenames);
@@ -149,8 +148,8 @@ int walkDirectory(const char *root, const char *vroot, struct sarray *arr) {
 
   for(i = 0; i < filenames.count; i++) {
     filename = sarray_getString(&filenames, i);
-    pathJoin(vroot, filename, &vresult);
-    pathJoin(root, filename, &result);
+    vresult = pathJoin(vroot, filename);
+    result = pathJoin(root, filename);
 
     // Recursive call
     walkDirectory(result, vresult, &nested_results);
