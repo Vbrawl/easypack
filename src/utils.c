@@ -53,6 +53,7 @@ int makedirs(const char *path, size_t pathsize, mode_t mode) {
   return 0;
 }
 
+
 int listDirectory(const char* dirpath, struct sarray *arr, unsigned char type) {
   DIR *d = NULL;
   struct dirent *dentry = NULL;
@@ -61,12 +62,14 @@ int listDirectory(const char* dirpath, struct sarray *arr, unsigned char type) {
 
   sarray_clearAll(arr);
 
+  // Open directory
   d = opendir(dirpath);
   if(d == NULL) {
     perror("listDirectory()");
-    return 0;
+    return -1;
   }
 
+  // Read all entries in the directory
   while((dentry = readdir(d)) != NULL) {
     if(dentry->d_type != type) continue;
     if(dentry->d_name[0] == '.' && dentry->d_name[1] == '\0') continue;
@@ -86,6 +89,7 @@ int listDirectory(const char* dirpath, struct sarray *arr, unsigned char type) {
     }
   }
 
+  // Cleanup
   closedir(d);
   return 0;
 }

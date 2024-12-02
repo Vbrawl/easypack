@@ -16,6 +16,17 @@
  * @retval -1 Failed
  */
 int makedirs(const char *path, size_t pathsize, mode_t mode);
+
+/**
+ * List all items of a specific type inside a specific directory
+ *
+ * @param[in] dirpath   The path to the directory to search
+ * @param[out] arr      A sarray to fill with all "type" items of the directory
+ * @param[in] type      The type to search for in the directory
+ *
+ * @retval 0  Succeeded
+ * @retval -1 Failed
+ */
 int listDirectory(const char *dirpath, struct sarray *arr, unsigned char type);
 int pathJoin(const char *p1, const char *p2, char **result);
 int walkDirectory(const char *root, const char *vroot, struct sarray *arr);
