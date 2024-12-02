@@ -8,34 +8,48 @@
 #include <stdbool.h>
 
 
-int makedirs(char* path, size_t pathsize, mode_t mode) {
-  if(path[0] == '/') return 0;
-  if(path[0] == '.' && path[1] == '\0') return 0;
+int makedirs(const char *path, size_t pathsize, mode_t mode) {
+  char *my_path = NULL;
+  size_t components = 1, pathlen = 0, i = 0;
+  bool throw_error = 0;
+
+  // Avoid creating current, previous and root directories
+  if(pathsize == 1 && path[0] == '/') return 0;
+  if(pathsize == 1 && path[0] == '.') return 0;
+  if(pathsize == 2 && path[0] == '.' && path[1] == '.') return 0;
+
+  // Get a copy of path
+  my_path = strndup(path, pathsize);
+  if(my_path == NULL) return -1;
 
   // Replace all "/" with NULL-byte, only skip the first
-  size_t components = 1;
-  for(size_t i = 1; i < pathsize; i++) {
-    if(path[i-1] == '\\') continue;
-    if(path[i] == '/') {
-      path[i] = '\0';
+  // Notice "components" variable's value
+  for(i = 1; i < pathsize; i++) {
+    // Don't edit escaped slashes
+    if(my_path[i-1] == '\\') continue;
+    if(my_path[i] == '/') {
+      my_path[i] = '\0';
       components++;
     }
   }
 
   // Create component and recover slash
-  for(size_t i = 0; i < components; i++) {
-    if(mkdir(path, mode) == -1) {
-      bool throw_error = (errno != EEXIST);
+  for(i = 0; i < components; i++) {
+    if(mkdir(my_path, mode) == -1) {
+      throw_error = (errno != EEXIST);
       if(throw_error) {
         perror("makedirs()");
+        free(my_path);
         return -1;
       }
     }
 
-    size_t pathlen = strlen(path);
-    path[pathlen] = '/';
+    pathlen = strlen(my_path);
+    my_path[pathlen] = '/';
   }
 
+  // Cleanup
+  free(my_path);
   return 0;
 }
 
