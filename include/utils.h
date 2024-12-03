@@ -48,6 +48,8 @@ char* pathJoin(const char *p1, const char *p2);
  * @param[in] vroot     The path to prepend to the results
  * @param[out] arr      An array to store the results
  *
+ * @retval 0  Succeeded
+ * @retval -1 Failed
  */
 int walkDirectory(const char *root, const char *vroot, struct sarray *arr);
 
