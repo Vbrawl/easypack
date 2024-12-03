@@ -23,7 +23,13 @@ struct sarray {
 char* sarray_getString(struct sarray *this, size_t index);
 
 /**
+ * Extend the internal sarray's buffer by a requested nubmer of bytes
  *
+ * @param this            The sarray object to operate on
+ * @param additional_size The number of bytes to add to the internal buffer's length
+ *
+ * @retval 0  Succeeded
+ * @retval -1 Failed
  *
  */
 int sarray_extendBy(struct sarray *this, size_t additional_size);
