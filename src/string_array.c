@@ -31,7 +31,7 @@ int sarray_addString(struct sarray *this, char *string, size_t string_size) {
   size_t old_buf_size = this->buf_size;
 
   int err = sarray_extendBy(this, string_size + 1);
-  if(err != 0) return err;
+  if(err != 0) return -1;
 
   memcpy(this->values + old_buf_size, string, string_size);
   this->values[this->buf_size - 1] = '\0';

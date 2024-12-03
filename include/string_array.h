@@ -33,6 +33,24 @@ char* sarray_getString(struct sarray *this, size_t index);
  *
  */
 int sarray_extendBy(struct sarray *this, size_t additional_size);
+
+/**
+ * Add a copy of the given string to the sarray
+ * @note  A NULL-byte is automatically added to sarray's copy
+ *
+ * @bug Setting `string_size` to a value larger than `string`'s
+ *      length is undefined behaviour.
+ *
+ * @bug Adding a `string` that contains NULL-bytes in undefined
+ *      behaviour
+ *
+ * @param this        The sarray object to operate on
+ * @param string      The string to copy to the sarray
+ * @param string_size The size of the string
+ *
+ * @retval 0  Succeeded
+ * @retval -1 Failed
+ */
 int sarray_addString(struct sarray *this, char *string, size_t string_size);
 int sarray_extendWith(struct sarray *this, struct sarray *other);
 int sarray_clearAll(struct sarray *this);
