@@ -4,14 +4,17 @@
 
 
 char* sarray_getString(struct sarray *this, size_t index) {
+  // Check if index exists
   if(index >= this->count) return NULL;
   char *cursor = this->values;
 
+  // Move the cursor to the requested string's position
   for(size_t i = 0; i < index; i++) {
     size_t offset = strlen(cursor);
     cursor += offset + 1;
   }
 
+  // Return cursor
   return cursor;
 }
 
