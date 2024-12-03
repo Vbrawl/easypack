@@ -38,6 +38,17 @@ int listDirectory(const char *dirpath, struct sarray *arr, unsigned char type);
  * @returns A pointer to the result on success, NULL on failure.
  */
 char* pathJoin(const char *p1, const char *p2);
+
+/**
+ * Get all files in a directorie's sub-tree
+ *
+ * @warning RECURSIVE IMPLEMENTATION
+ *
+ * @param[in] root      The root directory of the tree to search
+ * @param[in] vroot     The path to prepend to the results
+ * @param[out] arr      An array to store the results
+ *
+ */
 int walkDirectory(const char *root, const char *vroot, struct sarray *arr);
 
 #endif

@@ -128,14 +128,20 @@ int walkDirectory(const char *root, const char *vroot, struct sarray *arr) {
   char *result = NULL; // Store each iteration's fullpath in the below loops
   char *vresult = NULL; // Store each iteration's virtual fullpath in the below loops
   size_t i = 0; // Iterator for loops
+  int err = 0;
 
   /* List files in root */
-  listDirectory(root, &filenames, DT_REG);
+  err = listDirectory(root, &filenames, DT_REG);
+  if(err != 0) return -1;
 
   /* Add fullpath of files to "arr" string array */
   for(i = 0; i < filenames.count; i++) {
     filename = sarray_getString(&filenames, i);
     vresult = pathJoin(vroot, filename);
+    if(vresult == NULL) {
+      sarray_clearAll(&filenames);
+      return -1;
+    }
 
     sarray_addString(arr, vresult, strlen(vresult));
 
@@ -144,15 +150,28 @@ int walkDirectory(const char *root, const char *vroot, struct sarray *arr) {
   }
 
   sarray_clearAll(&filenames);
-  listDirectory(root, &filenames, DT_DIR);
+  err = listDirectory(root, &filenames, DT_DIR);
+  if(err != 0) return -1;
 
   for(i = 0; i < filenames.count; i++) {
     filename = sarray_getString(&filenames, i);
     vresult = pathJoin(vroot, filename);
+    if(vresult == NULL) return -1;
+
     result = pathJoin(root, filename);
+    if(result == NULL) {
+      free(vresult);
+      return -1;
+    }
 
     // Recursive call
-    walkDirectory(result, vresult, &nested_results);
+    err = walkDirectory(result, vresult, &nested_results);
+    if(err != 0) {
+      sarray_clearAll(&filenames);
+      free(vresult);
+      free(result);
+      return -1;
+    }
 
     // Connect results together
     sarray_extendWith(arr, &nested_results);
