@@ -48,7 +48,7 @@ int sarray_extendWith(struct sarray *this, struct sarray *other) {
   int err = 0;
 
   err = sarray_extendBy(this, other->buf_size);
-  if(err != 0) return err;
+  if(err != 0) return -1;
 
   memcpy(this->values + old_buf_size, other->values, other->buf_size);
   this->count += other->count;
@@ -56,7 +56,7 @@ int sarray_extendWith(struct sarray *this, struct sarray *other) {
   return 0;
 }
 
-int sarray_clearAll(struct sarray *this) {
+void sarray_clearAll(struct sarray *this) {
   if(this->values) free(this->values);
   this->values = NULL;
   this->count = 0;

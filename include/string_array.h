@@ -52,8 +52,24 @@ int sarray_extendBy(struct sarray *this, size_t additional_size);
  * @retval -1 Failed
  */
 int sarray_addString(struct sarray *this, char *string, size_t string_size);
+
+/**
+ * Extend sarray with another sarray
+ *
+ *
+ * @param this  The sarray object to extend
+ * @param other The sarray object to be appended
+ *
+ * @retval 0  Succeeded
+ * @retval -1 Failed
+ */
 int sarray_extendWith(struct sarray *this, struct sarray *other);
-int sarray_clearAll(struct sarray *this);
+
+/**
+ * Clear all fields of a sarray and free
+ * all allocated memory
+ */
+void sarray_clearAll(struct sarray *this);
 
 
 #endif
