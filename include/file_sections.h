@@ -4,6 +4,13 @@
 #include <stdint.h>
 #define MAX_FILENAME_SIZE 1024
 
+/**
+ * Get the name of this program's executable.
+ *
+ * @note  The caller is responsible for `free`ing the allocated string.
+ *
+ * @returns A pointer to a string containing the executable's name, or NULL on failure.
+ */
 char* getExecutableName();
 
 /**

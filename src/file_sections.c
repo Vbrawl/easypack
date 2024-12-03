@@ -13,8 +13,7 @@ char* getExecutableName() {
   // Try to allocate enough space
   size_t BUF_SIZE = 0;
   ssize_t lnksize = 0;
-  char *name = NULL,
-  *name_bak = NULL;
+  char *name = NULL, *name_bak = NULL;
 
   do {
     // Update buffer size
