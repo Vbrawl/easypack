@@ -15,3 +15,11 @@ add_custom_command(
 	COMMAND mkdir -p awd/dwa
 	COMMAND echo "Hello World" > awd/dwa/hi
 	COMMAND ./size_initializer easypack)
+
+
+enable_testing()
+
+add_executable(test_string_array tests/string_array.c src/string_array.c)
+target_include_directories(test_string_array PUBLIC include)
+add_test(NAME test_string_array
+          COMMAND test_string_array)

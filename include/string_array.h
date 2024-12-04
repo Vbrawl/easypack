@@ -23,6 +23,16 @@ struct sarray {
 char* sarray_getString(struct sarray *this, size_t index);
 
 /**
+ * Get the next string in the array
+ *
+ * @param[in] this    The sarray object to operate on
+ * @param[in] cursor  The cursor to the current string
+ *
+ * @returns A cursor to the next string on success, NULL on failure
+ */
+char* sarray_getNextString(struct sarray *this, char *cursor);
+
+/**
  * Extend the internal sarray's buffer by a requested nubmer of bytes
  *
  * @param this            The sarray object to operate on
@@ -51,7 +61,7 @@ int sarray_extendBy(struct sarray *this, size_t additional_size);
  * @retval 0  Succeeded
  * @retval -1 Failed
  */
-int sarray_addString(struct sarray *this, char *string, size_t string_size);
+int sarray_addString(struct sarray *this, const char *string, size_t string_size);
 
 /**
  * Extend sarray with another sarray

@@ -18,6 +18,18 @@ char* sarray_getString(struct sarray *this, size_t index) {
   return cursor;
 }
 
+char* sarray_getNextString(struct sarray *this, char *cursor) {
+  if(cursor == NULL) return this->values;
+
+  size_t cursor_offset = cursor - this->values;
+  size_t cursor_len = strlen(cursor);
+
+  if(cursor_offset + cursor_len + 1 >= this->buf_size) return NULL;
+
+  cursor += cursor_len + 1;
+  return cursor;
+}
+
 int sarray_extendBy(struct sarray *this, size_t additional_size) {
   char *temp = realloc(this->values, this->buf_size + additional_size);
   if(temp == NULL) return -1;
@@ -27,7 +39,7 @@ int sarray_extendBy(struct sarray *this, size_t additional_size) {
   return 0;
 }
 
-int sarray_addString(struct sarray *this, char *string, size_t string_size) {
+int sarray_addString(struct sarray *this, const char *string, size_t string_size) {
   size_t old_buf_size = this->buf_size;
 
   int err = sarray_extendBy(this, string_size + 1);
