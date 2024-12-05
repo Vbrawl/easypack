@@ -85,28 +85,6 @@ int extractPackageAndAutoRun(const char *out_dir, char *const *argv) {
   return 0;
 }
 
-/**
- * Make sure to free the return value if it's not NULL.
- */
-char* make_temp_directory(const char *template) {
-  size_t template_len = strlen(template);
-  size_t X_append = 6;
-
-  char *malloc_template = malloc(template_len + X_append + 1);
-  if(malloc_template == NULL) return NULL;
-  strncpy(malloc_template, template, template_len);
-  memset(malloc_template + template_len, 'X', X_append);
-  malloc_template[template_len + X_append] = '\0';
-
-  if(mkdtemp(malloc_template) == NULL) {
-    perror("mkdtemp");
-    free(malloc_template);
-    return NULL;
-  }
-
-  return malloc_template;
-}
-
 int main(int argc, char *const *argv) {
   int opt = 0, option_index = 0;
 

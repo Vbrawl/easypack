@@ -53,4 +53,16 @@ char* pathJoin(const char *p1, const char *p2);
  */
 int walkDirectory(const char *root, const char *vroot, struct sarray *arr);
 
+
+/**
+ * Create a temp directory based off of template
+ *
+ * @note Caller is responsible for `free`ing the returned value
+ *
+ * @param[in] template  The template of the directory's name
+ *
+ * @returns A pointer to the actual filename on success, NULL on failure.
+ */
+char* make_temp_directory(const char *template);
+
 #endif
