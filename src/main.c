@@ -11,13 +11,11 @@
 #include <getopt.h>
 #include "utils.h"
 #include "string_array.h"
+#include "forward.h"
 
 
 #define ENV_EASYPACK_ROOT "EASYPACK_ROOT"
 #define ENV_EASYPACK_OUT  "EASYPACK_OUT"
-#define EASYPACK_AUTORUN_NAME "autorun.easypack"
-#define ENVOUT_EASYPACK_CWD "EASYPACK_CWD"
-#define ENVOUT_EASYPACK_NAME "EASYPACK_NAME"
 
 int createPackage(const char *root, const char *out) {
   char *exe_name = NULL, *system_data = NULL;
@@ -75,43 +73,14 @@ int extractPackage(const char *out_dir) {
   return 0;
 }
 
-int setEasypackCWD() {
-  char cwd[PATH_MAX];
-  if(getcwd(cwd, PATH_MAX) == NULL) {
-    perror("getcwd");
-    return -1;
-  }
+int extractPackageAndAutoRun(const char *out_dir, char *const *argv) {
+  if(prepareEnvironment() != 0) return -1;
 
-  if(setenv(ENVOUT_EASYPACK_CWD, cwd, 1) != 0) {
-    perror("setenv");
-    return -1;
-  }
-  return 0;
-}
-
-int setEasypackName() {
-  char *name = getExecutableName();
-  if(name == NULL) return -1;
-
-  if(setenv(ENVOUT_EASYPACK_NAME, name, 1) != 0) {
-    perror("setenv");
-    return -1;
-  }
-
-  free(name);
-  return 0;
-}
-
-int extractPackageAndAutoRun(const char *out_dir, const char *autorun_name, char *const *argv) {
-  setEasypackName();
-  setEasypackCWD();
   extractPackage(out_dir);
   chdir(out_dir);
-  if(access(autorun_name, F_OK) == 0) {
-    chmod(autorun_name, S_IWUSR | S_IRUSR | S_IXUSR | S_IWGRP | S_IRGRP | S_IXGRP | S_IROTH | S_IXOTH);
-    execv(autorun_name, argv);
-    perror("extractPackageAndAutoRun -> execv");
-    return -1;
+  if(access(EASYPACK_AUTORUN_NAME, F_OK) == 0) {
+    executeAutoRun(EASYPACK_AUTORUN_NAME, argv);
+    return -2;
   }
   return 0;
 }
@@ -157,7 +126,7 @@ int main(int argc, char *const *argv) {
       out = make_temp_directory(mkdtemp_template);
       if(out == NULL) return -1;
     }
-    extractPackageAndAutoRun(out, EASYPACK_AUTORUN_NAME, argv);
+    extractPackageAndAutoRun(out, argv);
   }
 
   return 0;

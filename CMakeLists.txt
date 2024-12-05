@@ -6,7 +6,7 @@ set(CMAKE_C_STANDARD 11)
 
 add_executable(size_initializer build_utilities/size_initializer.c)
 
-add_executable(easypack src/main.c src/file_sections.c src/embedded_filesystem.c src/utils.c src/string_array.c)
+add_executable(easypack src/main.c src/file_sections.c src/embedded_filesystem.c src/utils.c src/string_array.c src/forward.c)
 target_include_directories(easypack PUBLIC include)
 
 add_dependencies(easypack size_initializer)
