@@ -2,7 +2,6 @@
 #define EASYPACK_UTILS_H
 
 #include <sys/stat.h>
-#include <stddef.h>
 #include "string_array.h"
 
 /**

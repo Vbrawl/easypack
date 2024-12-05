@@ -2,15 +2,8 @@
 #include "file_sections.h"
 #include "embedded_filesystem.h"
 #include <stdlib.h>
-#include <string.h>
-#include <stdint.h>
-#include <stdbool.h>
 #include <unistd.h>
-#include <limits.h>
-#include <sys/stat.h>
-#include <getopt.h>
 #include "utils.h"
-#include "string_array.h"
 #include "forward.h"
 
 
