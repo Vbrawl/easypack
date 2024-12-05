@@ -1,6 +1,7 @@
 #include "string_array.h"
 #include <string.h>
 #include <stdlib.h>
+#include <stdio.h>
 
 
 char* sarray_getString(struct sarray *this, size_t index) {
@@ -28,6 +29,54 @@ char* sarray_getNextString(struct sarray *this, char *cursor) {
 
   cursor += cursor_len + 1;
   return cursor;
+}
+
+int __sarray_addStringFromPointers(struct sarray *this, const char *start, size_t len) {
+  char *buf = NULL;
+  int err = 0;
+
+  buf = malloc(len + 1);
+  if(buf == NULL) {
+    perror("__sarray_addStringFromPointers -> malloc");
+    return -1;
+  }
+
+  strncpy(buf, start, len);
+  buf[len] = '\0';
+
+  err = sarray_addString(this, buf, len);
+  free(buf);
+
+  if(err == 0)  return 0;
+  else          return -1;
+}
+
+int sarray_addStringsFromList(struct sarray *this, const char *list, char separator) {
+  char *buf = NULL;
+  const char *start, *end, *list_end;
+  size_t buf_len = 0;
+  int err = 0;
+  list_end = list + strlen(list);
+  start = end = list;
+
+  while(end < list_end) {
+    if(*end == separator) {
+      buf_len = end - start;
+      err = __sarray_addStringFromPointers(this, start, buf_len);
+      if(err != 0) return -1;
+      start = end + 1;
+    }
+    end++;
+  }
+
+  if(start < end) {
+    buf_len = end - start;
+    err = __sarray_addStringFromPointers(this, start, buf_len);
+    if(err != 0) return -1;
+    start = end + 1;
+  }
+
+  return 0;
 }
 
 int sarray_extendBy(struct sarray *this, size_t additional_size) {

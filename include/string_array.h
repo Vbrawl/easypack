@@ -33,6 +33,18 @@ char* sarray_getString(struct sarray *this, size_t index);
 char* sarray_getNextString(struct sarray *this, char *cursor);
 
 /**
+ * Populate a sarray from the given string.
+ *
+ * @param[in] this  The sarray object to operate on
+ * @param[in] list  The string to parse and use for populating the sarray object
+ * @param[in] separator The character that acts as a separator in the list
+ *
+ * @retval 0  Succeeded
+ * @retval -1 Failed
+ */
+int sarray_addStringsFromList(struct sarray *this, const char *list, char separator);
+
+/**
  * Extend the internal sarray's buffer by a requested nubmer of bytes
  *
  * @param this            The sarray object to operate on
