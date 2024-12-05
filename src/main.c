@@ -4,12 +4,18 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdint.h>
+#include <stdbool.h>
 #include <unistd.h>
 #include <limits.h>
 #include <sys/stat.h>
+#include <getopt.h>
 #include "utils.h"
 #include "string_array.h"
 
+
+#define ENV_EASYPACK_ROOT "EASYPACK_ROOT"
+#define ENV_EASYPACK_OUT  "EASYPACK_OUT"
+#define EASYPACK_AUTORUN_NAME "autorun.easypack"
 
 int createPackage(const char *root, const char *out) {
   char *exe_name = NULL, *system_data = NULL;
@@ -37,6 +43,7 @@ int createPackage(const char *root, const char *out) {
 
   // Export the package
   setEmbeddedData(exe_name, out, system_data, system_size);
+  printf("Package created!\n");
 
   // Clean everything
   free(system_data);
@@ -46,19 +53,27 @@ int createPackage(const char *root, const char *out) {
 }
 
 int extractPackage(const char *out_dir) {
+  uint32_t dsize = 0;
   char *data = NULL;
   struct fs *system = NULL;
 
+  dsize = getEmbeddedDataSize(NULL);
+  if(dsize == 0) {
+    printf("Nothing to extract.\n");
+    return -1;
+  }
   data = getEmbeddedData(NULL);
   system = loadFileSystemFromData(data);
   dumpFileSystem(system, out_dir);
+
+  printf("Package extracted!\n");
 
   unLoadFileSystem(system);
   free(data);
   return 0;
 }
 
-int extractPackageAndAutoRun(const char *out_dir, const char *autorun_name) {
+int extractPackageAndAutoRun(const char *out_dir, const char *autorun_name, char *const *argv) {
   extractPackage(out_dir);
   chdir(out_dir);
   if(access(autorun_name, F_OK) == 0) {
@@ -70,23 +85,49 @@ int extractPackageAndAutoRun(const char *out_dir, const char *autorun_name) {
   return 0;
 }
 
+/**
+ * Make sure to free the return value if it's not NULL.
+ */
+char* make_temp_directory(const char *template) {
+  size_t template_len = strlen(template);
+  size_t X_append = 6;
 
-int main(int argc, char *const *argv) {
-  uint32_t data_size = 0;
-  const char *root = "awd";
-  const char *out_name = "easypack.new";
-  const char *out_dir = "dumped";
-  const char *autorun_name = "autorun.easypack";
+  char *malloc_template = malloc(template_len + X_append + 1);
+  if(malloc_template == NULL) return NULL;
+  strncpy(malloc_template, template, template_len);
+  memset(malloc_template + template_len, 'X', X_append);
+  malloc_template[template_len + X_append] = '\0';
 
-  data_size = getEmbeddedDataSize(NULL);
-  printf("Data Size: %u\n", data_size);
-
-  if(data_size == 0) {
-    return createPackage(root, out_name);
+  if(mkdtemp(malloc_template) == NULL) {
+    perror("mkdtemp");
+    free(malloc_template);
+    return NULL;
   }
-  else {
-    return extractPackageAndAutoRun(out_dir, autorun_name);
-  }
+
+  return malloc_template;
 }
 
+int main(int argc, char *const *argv) {
+  int opt = 0, option_index = 0;
 
+  const char *root = getenv(ENV_EASYPACK_ROOT);
+  const char *out = getenv(ENV_EASYPACK_OUT);
+  const char *mkdtemp_template = "/tmp/easypack_";
+
+  if(root != NULL) {
+    if(out == NULL) {
+      printf("Can't output new package without a proper filename\n");
+      return -1;
+    }
+    createPackage(root, out);
+  }
+  else {
+    if(out == NULL) {
+      out = make_temp_directory(mkdtemp_template);
+      if(out == NULL) return -1;
+    }
+    extractPackageAndAutoRun(out, EASYPACK_AUTORUN_NAME, argv);
+  }
+
+  return 0;
+}
