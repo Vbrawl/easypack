@@ -16,6 +16,8 @@
 #define ENV_EASYPACK_ROOT "EASYPACK_ROOT"
 #define ENV_EASYPACK_OUT  "EASYPACK_OUT"
 #define EASYPACK_AUTORUN_NAME "autorun.easypack"
+#define ENVOUT_EASYPACK_CWD "EASYPACK_CWD"
+#define ENVOUT_EASYPACK_NAME "EASYPACK_NAME"
 
 int createPackage(const char *root, const char *out) {
   char *exe_name = NULL, *system_data = NULL;
@@ -73,7 +75,36 @@ int extractPackage(const char *out_dir) {
   return 0;
 }
 
+int setEasypackCWD() {
+  char cwd[PATH_MAX];
+  if(getcwd(cwd, PATH_MAX) == NULL) {
+    perror("getcwd");
+    return -1;
+  }
+
+  if(setenv(ENVOUT_EASYPACK_CWD, cwd, 1) != 0) {
+    perror("setenv");
+    return -1;
+  }
+  return 0;
+}
+
+int setEasypackName() {
+  char *name = getExecutableName();
+  if(name == NULL) return -1;
+
+  if(setenv(ENVOUT_EASYPACK_NAME, name, 1) != 0) {
+    perror("setenv");
+    return -1;
+  }
+
+  free(name);
+  return 0;
+}
+
 int extractPackageAndAutoRun(const char *out_dir, const char *autorun_name, char *const *argv) {
+  setEasypackName();
+  setEasypackCWD();
   extractPackage(out_dir);
   chdir(out_dir);
   if(access(autorun_name, F_OK) == 0) {
