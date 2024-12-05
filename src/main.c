@@ -36,6 +36,8 @@ int createPackage(const char *root, const char *out) {
 
   // Export the package
   setEmbeddedData(exe_name, out, system_data, system_size);
+
+  chmod(out, S_IWUSR | S_IRUSR | S_IXUSR | S_IXGRP | S_IXOTH);
   printf("Package created!\n");
 
   // Clean everything
