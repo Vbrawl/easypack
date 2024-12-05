@@ -19,6 +19,7 @@ execute_process(
   COMMAND cp build_utilities/wrap_awd.sh ${CMAKE_BINARY_DIR}/wrap_awd.sh
   COMMAND mkdir -p ${CMAKE_BINARY_DIR}/awd/dwa
   COMMAND bash -c "echo \"Hello World\" > ${CMAKE_BINARY_DIR}/awd/dwa/hi"
+  COMMAND bash -c "echo -e '#!/bin/bash\necho \"ARGS: \${EASYPACK_NAME} \${@}\"\necho \"CWD: \$(pwd)\"\necho \"REALCWD: \${EASYPACK_CWD}\"' > ${CMAKE_BINARY_DIR}/awd/autorun.easypack"
 )
 
 enable_testing()
