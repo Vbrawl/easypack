@@ -14,14 +14,24 @@ char test_getString() {
   sarray_addString(&arr, hello, strlen(hello));
 
   char *cursor = sarray_getString(&arr, 0);
-  if(strcmp(cursor, hi) != 0) return 1;
+  if(strcmp(cursor, hi) != 0) {
+    sarray_clearAll(&arr);
+    return 1;
+  }
 
   cursor = sarray_getString(&arr, 1);
-  if(strcmp(cursor, hello) != 0) return 2;
+  if(strcmp(cursor, hello) != 0) {
+    sarray_clearAll(&arr);
+    return 2;
+  }
 
   cursor = sarray_getString(&arr, 2);
-  if(cursor != NULL) return 3;
+  if(cursor != NULL) {
+    sarray_clearAll(&arr);
+    return 3;
+  }
 
+  sarray_clearAll(&arr);
   return 0;
 }
 
@@ -51,9 +61,9 @@ char test_getNextString() {
     return 3;
   }
 
+  sarray_clearAll(&arr);
   return 0;
 }
-
 
 int main() {
   int status = 0;
