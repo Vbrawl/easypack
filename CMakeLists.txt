@@ -29,6 +29,9 @@ execute_process(
   COMMAND bash -c "echo -e '#!/bin/bash\necho \"ARGS: \${EASYPACK_NAME} \${@}\"\necho \"CWD: \$(pwd)\"\necho \"REALCWD: \${EASYPACK_CWD}\"' > ${CMAKE_BINARY_DIR}/awd/autorun.easypack"
 )
 
+# List addons
+add_subdirectory(addons/autorun_creator)
+
 # Enable automatic testing
 enable_testing()
 
