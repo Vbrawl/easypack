@@ -45,7 +45,6 @@ int createPackage(const char *root, const char *out) {
   setEmbeddedData(exe_name, out, system_data, system_size);
 
   chmod(out, S_IWUSR | S_IRUSR | S_IXUSR | S_IXGRP | S_IXOTH);
-  printf("Package created!\n");
 
   // Clean everything
   free(system_data);
@@ -67,8 +66,6 @@ int extractPackage(const char *out_dir) {
   data = getEmbeddedData(NULL);
   system = loadFileSystemFromData(data);
   dumpFileSystem(system, out_dir);
-
-  printf("Package extracted!\n");
 
   unLoadFileSystem(system);
   free(data);
