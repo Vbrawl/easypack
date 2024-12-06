@@ -5,6 +5,7 @@
 #include <unistd.h>
 #include "utils.h"
 #include "forward.h"
+#include "addons.h"
 
 
 #define ENV_EASYPACK_ROOT "EASYPACK_ROOT"
@@ -25,13 +26,19 @@ int createPackage(const char *root, const char *out) {
     return 2;
   }
 
+  // Call all addons
+  if(executeAddons(system) != 0) {
+    printf("An error occured while executing addons!\n");
+    return 3;
+  }
+
   // Extract required info from the system
   system_size = calculateFileSystemAsDataLength(system);
   if((system_data = exportFileSystemAsData(system, system_size)) == NULL) {
     free(system_data);
     unLoadFileSystem(system);
     free(exe_name);
-    return 3;
+    return 4;
   }
 
   // Export the package
