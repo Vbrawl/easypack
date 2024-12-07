@@ -34,6 +34,10 @@ execute_process(
 # List addons
 add_subdirectory(addons/autorun_creator)
 
+# Install instructions
+install(TARGETS easypack RUNTIME DESTINATION bin)
+install(DIRECTORY include/ DESTINATION include/easypack)
+
 # Enable automatic testing
 enable_testing()
 
