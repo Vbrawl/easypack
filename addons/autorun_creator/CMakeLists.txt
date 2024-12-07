@@ -5,4 +5,4 @@ set(CMAKE_C_STANDARD 11)
 include_directories(PUBLIC ../../include)
 add_library(autoruncreator SHARED autorun_creator.c)
 install(TARGETS autoruncreator
-        LIBRARY DESTINATION lib)
+        LIBRARY DESTINATION lib/easypack/)
