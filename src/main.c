@@ -108,19 +108,28 @@ int main(int argc, char *const *argv) {
   const char *out = getenv(ENV_EASYPACK_OUT);
   const char *mkdtemp_template = "/tmp/easypack_";
 
-  if(root != NULL) {
-    if(out == NULL) {
-      printf("Can't output new package without a proper filename\n");
-      return -1;
-    }
-    createPackage(root, out);
-  }
-  else {
+
+  uint32_t dsize = 0;
+  dsize = getEmbeddedDataSize(NULL);
+  if(dsize > 0) {
     if(out == NULL) {
       out = make_temp_directory(mkdtemp_template);
       if(out == NULL) return -1;
     }
     extractPackageAndAutoRun(out, argv);
+  }
+  else {
+    if(root == NULL) {
+      printf("Package empty!\nCreate a new package by setting the required environment variables!\n");
+      return -1;
+    }
+
+    if(out == NULL) {
+      printf("Can't output new package without a proper filename!\n");
+      return -1;
+    }
+
+    createPackage(root, out);
   }
 
   return 0;
