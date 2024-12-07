@@ -41,7 +41,7 @@ char* getExecutableName() {
 
     // readlink doesn't add a NULL-byte
     name[lnksize] = '\0';
-  } while(lnksize == BUF_SIZE);
+  } while(lnksize == (ssize_t)BUF_SIZE);
 
   // finally return the executable name
   return name;

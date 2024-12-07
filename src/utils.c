@@ -57,7 +57,6 @@ int makedirs(const char *path, size_t pathsize, mode_t mode) {
 int listDirectory(const char* dirpath, struct sarray *arr, unsigned char type) {
   DIR *d = NULL;
   struct dirent *dentry = NULL;
-  char *temp = NULL;
   size_t fname_size = 0;
 
   sarray_clearAll(arr);
@@ -191,7 +190,7 @@ char* make_temp_directory(const char *template) {
 
   char *malloc_template = malloc(template_len + X_append + 1);
   if(malloc_template == NULL) return NULL;
-  strncpy(malloc_template, template, template_len);
+  memcpy(malloc_template, template, template_len);
   memset(malloc_template + template_len, 'X', X_append);
   malloc_template[template_len + X_append] = '\0';
 

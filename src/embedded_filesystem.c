@@ -94,7 +94,6 @@ char* exportFileSystemAsData(struct fs *system, uint32_t size) {
 
 void dumpFileSystem(struct fs *system, const char* dir_name) {
   int err = 0;
-  size_t dir_name_size = strlen(dir_name);
   for(size_t i = 0; i < system->size; i++) {
     struct fs_item *item = &system->files[i];
 
@@ -186,9 +185,8 @@ struct fs* loadFileSystem(const char* dir_name) {
     rbytes = fread(data, sizeof(char), fileinfo.st_size, f);
     fclose(f);
 
-    if(rbytes != fileinfo.st_size) {
+    if(rbytes != (size_t)fileinfo.st_size) {
       printf("loadFileSystem(): Couldn't read whole file.\n");
-      free(fullpath);
       free(data);
       unLoadFileSystem(system);
       sarray_clearAll(&files);
@@ -230,7 +228,7 @@ int addFileToFileSystem(struct fs *system, const char* filename, char* data, off
   item->filename[sizeof(char) * item->fsize] = '\0';
 
   // set dsize and data
-  item->dsize = dsize;
+  item->dsize = dsize32;
   item->data = malloc(sizeof(char) * item->dsize);
   memcpy(item->data, data, sizeof(char) * item->dsize);
 

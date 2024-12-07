@@ -16,7 +16,7 @@
 
 char* quotedJoin(struct sarray *list) {
   char *data = NULL, *tmp = NULL, *cursor = NULL;
-  size_t doffset = 0, csize = 0;
+  size_t csize = 0;
   size_t dsize = list->buf_size + (list->count * 2);
 
   if(dsize == 0) {
@@ -35,7 +35,7 @@ char* quotedJoin(struct sarray *list) {
 
     *tmp = '"';
     tmp++;
-    strncpy(tmp, cursor, csize);
+    memcpy(tmp, cursor, csize);
     tmp += csize;
     *tmp = '"';
     tmp++;
@@ -52,7 +52,7 @@ int execute(struct fs *system) {
 
   executable = getenv(ENV_AUTORUNCREATOR_FILENAME);
   if(executable == NULL) {
-    printf("Define \"%s\" environment variable to proceed!\n");
+    printf("Define \"" ENV_AUTORUNCREATOR_FILENAME  "\" environment variable to proceed!\n");
     return -1;
   }
 

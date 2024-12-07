@@ -11,6 +11,11 @@
 
 #include "embedded_filesystem.h"
 
+union AddonSymbol {
+  void *raw;
+  int (*Fexecute)(struct fs*);
+};
+
 int executeAddons(struct fs *system);
 
 

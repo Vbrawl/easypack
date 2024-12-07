@@ -7,13 +7,11 @@
 int executeAddons(struct fs *system) {
   const char *addon_list = NULL;
   char *cursor = NULL;
-  char *filename = NULL;
   void *handle = NULL;
   struct sarray addons = {0};
-  size_t i = 0;
   int status = 0;
   const char *error_message = NULL;
-  int(*execute_addon)(struct fs*) = NULL;
+  union AddonSymbol sym_execute; sym_execute.raw = NULL;
 
   addon_list = getenv(ENV_EASYPACK_ADDONS);
   if(addon_list == NULL) return 0;
@@ -30,8 +28,8 @@ int executeAddons(struct fs *system) {
       return -1;
     }
 
-    execute_addon = dlsym(handle, "execute");
-    if(execute_addon == NULL) {
+    sym_execute.raw = dlsym(handle, "execute");
+    if(sym_execute.raw == NULL) {
       error_message = dlerror();
       if(error_message) printf("execute_addons -> dlsym: %s\n", error_message);
       dlclose(handle);
@@ -39,7 +37,7 @@ int executeAddons(struct fs *system) {
       return -1;
     }
 
-    status = execute_addon(system);
+    status = sym_execute.Fexecute(system);
     dlclose(handle);
 
     if(status != 0) return -1;

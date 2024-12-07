@@ -52,17 +52,16 @@ int __sarray_addStringFromPointers(struct sarray *this, const char *start, size_
 }
 
 int sarray_addStringsFromList(struct sarray *this, const char *list, char separator) {
-  char *buf = NULL;
   const char *start, *end, *list_end;
-  size_t buf_len = 0;
+  size_t string_len = 0;
   int err = 0;
   list_end = list + strlen(list);
   start = end = list;
 
   while(end < list_end) {
     if(*end == separator) {
-      buf_len = end - start;
-      err = __sarray_addStringFromPointers(this, start, buf_len);
+      string_len = end - start;
+      err = __sarray_addStringFromPointers(this, start, string_len);
       if(err != 0) return -1;
       start = end + 1;
     }
@@ -70,8 +69,8 @@ int sarray_addStringsFromList(struct sarray *this, const char *list, char separa
   }
 
   if(start < end) {
-    buf_len = end - start;
-    err = __sarray_addStringFromPointers(this, start, buf_len);
+    string_len = end - start;
+    err = __sarray_addStringFromPointers(this, start, string_len);
     if(err != 0) return -1;
     start = end + 1;
   }
@@ -103,9 +102,6 @@ int sarray_addString(struct sarray *this, const char *string, size_t string_size
 
 int sarray_extendWith(struct sarray *this, struct sarray *other) {
   size_t old_buf_size = this->buf_size;
-  size_t item_size = 0;
-  char *item = NULL;
-  size_t i = 0;
   int err = 0;
 
   err = sarray_extendBy(this, other->buf_size);

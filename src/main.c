@@ -6,7 +6,9 @@
 #include "utils.h"
 #include "forward.h"
 #include "addons.h"
+#include <limits.h>
 
+#define UNUSED(x) (void)(x)
 
 #define ENV_EASYPACK_ROOT "EASYPACK_ROOT"
 #define ENV_EASYPACK_OUT  "EASYPACK_OUT"
@@ -72,20 +74,35 @@ int extractPackage(const char *out_dir) {
   return 0;
 }
 
+/**
+ * @retval 0  Success
+ * @retval -1 Failed
+ * @retval -2 Failed is changed
+ */
 int extractPackageAndAutoRun(const char *out_dir, char *const *argv) {
+  char prev_path[PATH_MAX];
+  int error = 0;
+
+  if(getcwd(prev_path, PATH_MAX) == NULL) return -1;
   if(prepareEnvironment() != 0) return -1;
 
-  extractPackage(out_dir);
-  chdir(out_dir);
+  error = extractPackage(out_dir);
+  if(error != 0) return -1;
+
+  error = chdir(out_dir);
+  if(error != 0) return -1;
+
   if(access(EASYPACK_AUTORUN_NAME, F_OK) == 0) {
     executeAutoRun(EASYPACK_AUTORUN_NAME, argv);
-    return -2;
+    error = chdir(prev_path);
+    if(error != 0) return -2;
+    return -1;
   }
   return 0;
 }
 
 int main(int argc, char *const *argv) {
-  int opt = 0, option_index = 0;
+  UNUSED(argc);
 
   const char *root = getenv(ENV_EASYPACK_ROOT);
   const char *out = getenv(ENV_EASYPACK_OUT);

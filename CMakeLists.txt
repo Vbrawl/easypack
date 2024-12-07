@@ -2,6 +2,8 @@ cmake_minimum_required(VERSION 3.10)
 project(EasyPack)
 set(CMAKE_C_STANDARD 11)
 
+add_compile_options(-Wall -Wextra -Wpedantic -O2 -march=native -pipe -fstack-protector-strong)
+
 # Utility that adds a uint32 to the end of the executable
 add_executable(size_initializer build_utilities/size_initializer.c)
 
