@@ -25,7 +25,7 @@ char* quotedJoin(struct sarray *list) {
     return data;
   }
 
-  tmp = data = malloc(dsize + 1);
+  tmp = data = malloc(dsize);
   while((cursor = sarray_getNextString(list, cursor)) != NULL) {
     if(tmp != data) {
       *tmp = ' ';
@@ -40,7 +40,7 @@ char* quotedJoin(struct sarray *list) {
     *tmp = '"';
     tmp++;
   }
-  data[dsize] = '\0';
+  *tmp = '\0';
   return data;
 }
 
@@ -72,7 +72,7 @@ int execute(struct fs *system) {
     sarray_clearAll(&executables);
     return -1;
   }
-  snprintf(data, dsize, AUTORUN_DATA, executable, executables_quoted_list);
+  snprintf(data, dsize + 1, AUTORUN_DATA, executable, executables_quoted_list);
   data[dsize] = '\0';
 
   addFileToFileSystem(system, AUTORUN_FILENAME, data, dsize);
