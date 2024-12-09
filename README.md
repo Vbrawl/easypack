@@ -28,6 +28,7 @@ This makes ensures that:
 - **EASYPACK_ROOT**: The root of a new package. When defined it's assumed we are creating a new package.
 - **EASYPACK_OUT**: Output path. When extracting it's a directory, when packing it's a filename.
 - **EASYPACK_ADDONS**: A comma separated list of specifically created .so files to be executed at package time. (The execution happens at the same order as the list is defined)
+- **EASYPACK_MOUNTPOINTS**: A comma separated list of files and the location they should have inside the package separated by a colon. (Example: my/assets/directory:assets,my/data/directory:data)
 
 # Runtime environment
 
