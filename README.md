@@ -38,6 +38,58 @@ Environment variables:
 - **EASYPACK_NAME**: The full path to the package (eg, /usr/bin/program)
 - **EASYPACK_CWD**: The CWD in which the package was called (eg, /home/user)
 
+# Example for python applications
+
+Imagine you have the following structure:
+
+| project
+| - src
+| - assets
+| - configs
+
+To compile this project to a single package you can simply execute the following command:
+```
+EASYPACK_ROOT=project \
+EASYPACK_OUT=my_project_package \
+EASYPACK_ADDONS=/usr/lib/easypack/libautoruncreator.so \
+ARC_FILE=src/main.py \
+easypack
+```
+
+The above will create a package that works on machines with the python compiler installed.
+But what if you want to run this package on a machine without python?
+
+You can do the following:
+
+1) Compile python from source in a directory
+2) Modify src/main.py shebang to point to a subdirectory where the python compiler exists in the package
+3) Add EASYPACK_MOUNTPOINT and ARC_EXECUTABLES parameters to the above command
+
+**NOTE FOR WINDOWS**: You don't need to compile from source code as there are embeddable installations
+                        available at "python.org" which you can use directly in your project, but they may be harder
+                        to setup with requirements since you need to manually install pip and it doesn't work well out
+                        of the box.
+
+An example assuming python 3.13.1 is compiled at "/tmp/cpython/portable":
+
+src/main.py:
+```
+#!python/portable/bin/python3.13
+
+print("Hello World")
+```
+
+```
+EASYPACK_ROOT=project \
+EASYPACK_OUT=my_project_package \
+EASYPACK_ADDONS=/usr/lib/easypack/libautoruncreator.so \
+EASYPACK_MOUNTPOINTS=/tmp/cpython/portable:python/portable \
+ARC_FILE=src/main.py \
+ARC_EXECUTABLES=python/portable/bin/python3.13 \
+easypack
+```
+
+
 # License
 
 EasyPack is licensed under the MIT License.
