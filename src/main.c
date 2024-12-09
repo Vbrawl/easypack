@@ -7,14 +7,18 @@
 #include "forward.h"
 #include "addons.h"
 #include <limits.h>
+#include <string.h>
 
 #define UNUSED(x) (void)(x)
 
-#define ENV_EASYPACK_ROOT "EASYPACK_ROOT"
-#define ENV_EASYPACK_OUT  "EASYPACK_OUT"
+#define ENV_EASYPACK_ROOT         "EASYPACK_ROOT"
+#define ENV_EASYPACK_OUT          "EASYPACK_OUT"
+#define ENV_EASYPACK_MOUNTPOINTS  "EASYPACK_MOUNTPOINTS"
+#define MOUNTPOINT_SEPARATOR      ','
+#define MOUNTPOINT_DIRECTION_SEPARATOR ':'
 
-int createPackage(const char *root, const char *out) {
-  char *exe_name = NULL, *system_data = NULL;
+int createPackage(const char *root, const char *out, struct sarray *mountpoints) {
+  char *exe_name = NULL, *system_data = NULL, *cursor = NULL;
   uint32_t system_size = 0;
   struct fs *system = NULL;
 
@@ -28,9 +32,37 @@ int createPackage(const char *root, const char *out) {
     return 2;
   }
 
+  // Add all mountpoints to virtual filesystem
+  while((cursor = sarray_getNextString(mountpoints, cursor)) != NULL) {
+    char *src = NULL, *dst = NULL;
+
+    if(splitOnce(cursor, strlen(cursor), &src, &dst, MOUNTPOINT_DIRECTION_SEPARATOR) == -1) {
+      printf("An error occured while adding mountpoint!\n");
+      unLoadFileSystem(system);
+      free(exe_name);
+      return -1;
+    }
+
+    struct fs *other = loadFileSystem(src);
+
+    if(extendFileSystem(system, other, dst) == -1) {
+      unLoadFileSystem(system);
+      unLoadFileSystem(other);
+      free(exe_name);
+      return -1;
+    }
+
+    unLoadFileSystem(other);
+
+    free(src);
+    free(dst);
+  }
+
   // Call all addons
   if(executeAddons(system) != 0) {
     printf("An error occured while executing addons!\n");
+    unLoadFileSystem(system);
+    free(exe_name);
     return 3;
   }
 
@@ -106,6 +138,10 @@ int main(int argc, char *const *argv) {
 
   const char *root = getenv(ENV_EASYPACK_ROOT);
   const char *out = getenv(ENV_EASYPACK_OUT);
+
+  struct sarray mountpoints = {0};
+  const char *mountpoints_str = getenv(ENV_EASYPACK_MOUNTPOINTS);
+
   const char *mkdtemp_template = "/tmp/easypack_";
 
 
@@ -129,7 +165,14 @@ int main(int argc, char *const *argv) {
       return -1;
     }
 
-    createPackage(root, out);
+    if(mountpoints_str != NULL) {
+      if(sarray_addStringsFromList(&mountpoints, mountpoints_str, MOUNTPOINT_SEPARATOR) == -1) {
+        printf("Couldn't parse mountpoints!\n");
+        return -1;
+      }
+    }
+
+    createPackage(root, out, &mountpoints);
   }
 
   return 0;

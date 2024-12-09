@@ -234,3 +234,24 @@ int addFileToFileSystem(struct fs *system, const char* filename, char* data, off
 
   return 0;
 }
+
+
+int extendFileSystem(struct fs *system, struct fs *other, const char *vroot) {
+  size_t i = 0;
+  char *fullpath = NULL;
+  struct fs_item *cursor = NULL;
+
+  for(i = 0; i < other->size; i++) {
+    cursor = &other->files[i];
+
+    fullpath = pathJoin(vroot, cursor->filename);
+    if(fullpath == NULL) return -1;
+
+    addFileToFileSystem(system, fullpath, cursor->data, cursor->dsize);
+
+    free(fullpath);
+  }
+
+  return 0;
+}
+

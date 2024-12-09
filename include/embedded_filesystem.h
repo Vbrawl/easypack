@@ -99,4 +99,16 @@ struct fs* loadFileSystem(const char* dir_name);
 int addFileToFileSystem(struct fs *system, const char* filename, char* data, off_t dsize);
 
 
+/**
+ * Add a filesystem inside another filesystem struct under a specific virtual root.
+ *
+ * @param[in, out]  system      The filesystem to be updated
+ * @param[in]       other       The filesystem to be added
+ * @param[in]       vroot       The directory in which `other` should be placed inside `system`
+ *
+ * @retval 0  Succeeded
+ * @retval -1 Failed
+ */
+int extendFileSystem(struct fs *system, struct fs *other, const char *vroot);
+
 #endif
