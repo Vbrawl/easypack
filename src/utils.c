@@ -203,3 +203,30 @@ char* make_temp_directory(const char *template) {
   return malloc_template;
 }
 
+int splitOnce(const char *data, size_t dsize, char **part1, char **part2, char separator) {
+  size_t p1size = 0, p2size = 0;
+  char *separator_at = memchr(data, separator, dsize);
+  if(separator_at == NULL) return -1;
+
+  // Calculate sizes
+  p1size = separator_at - data;
+  p2size = (data + dsize) - separator_at;
+
+  // Allocate enough memory
+  (*part1) = malloc(p1size + 1);
+  if(*part1 == NULL) return -1;
+  (*part2) = malloc(p2size + 1);
+  if(*part2 == NULL) {
+    free(*part1);
+    return -1;
+  }
+
+  // Copy buffers
+  memcpy(*part1, data, p1size);
+  (*part1)[p1size] = '\0';
+
+  memcpy(*part2, data + p1size + 1, p2size);
+  (*part2)[p2size] = '\0';
+
+  return 0;
+}

@@ -52,3 +52,4 @@ endmacro()
 
 # Add test cases
 TESTCASE(test_string_array tests/string_array.c src/string_array.c)
+TESTCASE(test_utils tests/utils.c src/utils.c src/string_array.c)

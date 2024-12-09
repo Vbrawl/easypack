@@ -64,4 +64,18 @@ int walkDirectory(const char *root, const char *vroot, struct sarray *arr);
  */
 char* make_temp_directory(const char *template);
 
+/**
+ * Split data once at the first found separator
+ *
+ * @param[in] data      The data to split
+ * @param[in] dsize     The data size
+ * @param[out] part1    An address to a char* variable to return first part
+ * @param[out] part2    An address to a char* variable to return second part
+ * @param[in] separator The separator
+ *
+ * @retval 0  Succeeded
+ * @retval -1 Failed
+ */
+int splitOnce(const char *data, size_t dsize, char **part1, char **part2, char separator);
+
 #endif
