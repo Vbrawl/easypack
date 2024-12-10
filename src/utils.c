@@ -1,17 +1,20 @@
 #include "utils.h"
 #include <stdio.h>
 #include <string.h>
-#include <dirent.h>
-#include <sys/types.h>
 #include <stdlib.h>
 #include <errno.h>
-#include <stdbool.h>
 
+// Avoid memrchr not being available
+void* memchr_reverse(const void *s, int c, size_t n) {
+  for(const char *cursor = ((const char*)s) + n; cursor >= (const char*)s; cursor--) {
+    if(*cursor == (char)c) return (void*)cursor;
+  }
+  return NULL;
+}
 
-int makedirs(const char *path, size_t pathsize, mode_t mode) {
+int makedirs(const char *path, size_t pathsize) {
   char *my_path = NULL;
   size_t components = 1, pathlen = 0, i = 0;
-  bool throw_error = 0;
 
   // Avoid creating current, previous and root directories
   if(pathsize == 1 && path[0] == '/') return 0;
@@ -35,13 +38,10 @@ int makedirs(const char *path, size_t pathsize, mode_t mode) {
 
   // Create component and recover slash
   for(i = 0; i < components; i++) {
-    if(mkdir(my_path, mode) == -1) {
-      throw_error = (errno != EEXIST);
-      if(throw_error) {
-        perror("makedirs()");
-        free(my_path);
-        return -1;
-      }
+    if(makeDirectory(my_path) == -1) {
+      perror("makedirs()");
+      free(my_path);
+      return -1;
     }
 
     pathlen = strlen(my_path);
@@ -50,46 +50,6 @@ int makedirs(const char *path, size_t pathsize, mode_t mode) {
 
   // Cleanup
   free(my_path);
-  return 0;
-}
-
-
-int listDirectory(const char* dirpath, struct sarray *arr, unsigned char type) {
-  DIR *d = NULL;
-  struct dirent *dentry = NULL;
-  size_t fname_size = 0;
-
-  sarray_clearAll(arr);
-
-  // Open directory
-  d = opendir(dirpath);
-  if(d == NULL) {
-    perror("listDirectory()");
-    return -1;
-  }
-
-  // Read all entries in the directory
-  while((dentry = readdir(d)) != NULL) {
-    if(dentry->d_type != type) continue;
-    if(dentry->d_name[0] == '.' && dentry->d_name[1] == '\0') continue;
-    if(dentry->d_name[0] == '.' && dentry->d_name[1] == '.'
-       && dentry->d_name[2] == '\0') continue;
-    // Runs only for required type
-
-    // get name size
-    fname_size = strlen(dentry->d_name);
-
-    // add name to sarray
-    if(0 != sarray_addString(arr, dentry->d_name, fname_size)) {
-      perror("listDirectory()");
-      sarray_clearAll(arr);
-      closedir(d);
-      return -1;
-    }
-  }
-
-  // Cleanup
-  closedir(d);
   return 0;
 }
 
@@ -203,9 +163,12 @@ char* make_temp_directory(const char *template) {
   return malloc_template;
 }
 
-int splitOnce(const char *data, size_t dsize, char **part1, char **part2, char separator) {
+int splitOnce(const char *data, size_t dsize, char **part1, char **part2, char separator, bool reverse) {
   size_t p1size = 0, p2size = 0;
-  char *separator_at = memchr(data, separator, dsize);
+  char *separator_at = NULL;
+
+  if(reverse) separator_at = memchr_reverse(data, separator, dsize);
+  else        separator_at = memchr(data, separator, dsize);
   if(separator_at == NULL) return -1;
 
   // Calculate sizes

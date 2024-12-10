@@ -4,17 +4,34 @@ set(CMAKE_C_STANDARD 11)
 
 add_compile_options(-Wall -Wextra -Wpedantic -O2 -march=native -pipe -fstack-protector-strong)
 
-# Utility that adds a uint32 to the end of the executable
-add_executable(size_initializer build_utilities/size_initializer.c)
+
+set(EASYPACK_SOURCES
+  src/main.c
+  src/file_sections.c
+  src/embedded_filesystem.c
+  src/utils.c
+  src/string_array.c
+  src/forward.c
+  src/addons.c)
+
+set(OS_SOURCES)
+
+if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
+else()
+  list(APPEND OS_SOURCES
+        src/utils.linux.c
+        src/forward.linux.c
+        src/file_sections.linux.c
+        src/addons.linux.c)
+endif()
 
 # Main executable
-add_executable(easypack
-  src/main.c src/file_sections.c
-  src/embedded_filesystem.c
-  src/utils.c src/string_array.c
-  src/forward.c src/addons.c)
+add_executable(easypack ${EASYPACK_SOURCES} ${OS_SOURCES})
 target_include_directories(easypack PUBLIC include)
 target_link_options(easypack PRIVATE -rdynamic)
+
+# Utility that adds a uint32 to the end of the executable
+add_executable(size_initializer build_utilities/size_initializer.c)
 
 # Automatically execute size_initializer after easypack is compiled
 add_dependencies(easypack size_initializer)
@@ -51,5 +68,6 @@ add_test(NAME ${test_name} COMMAND ${test_name})
 endmacro()
 
 # Add test cases
-TESTCASE(test_string_array tests/string_array.c src/string_array.c)
-TESTCASE(test_utils tests/utils.c src/utils.c src/string_array.c)
+TESTCASE(test_string_array tests/string_array.c src/string_array.c ${OS_SOURCES})
+TESTCASE(test_utils tests/utils.c src/utils.c src/string_array.c ${OS_SOURCES})
+TESTCASE(test_file_sections tests/file_sections.c src/file_sections.c src/utils.c src/string_array.c ${OS_SOURCES})

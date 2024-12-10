@@ -2,7 +2,7 @@
 #define EASYPACK_EMBEDDED_FILESYSTEM_H
 
 #include <stdint.h>
-#include <sys/types.h>
+#include <stddef.h>
 
 /**
  * Embedded Filesystem item
@@ -96,7 +96,7 @@ struct fs* loadFileSystem(const char* dir_name);
  * @retval 0  Succeeded
  * @retval -1 Failed
  */
-int addFileToFileSystem(struct fs *system, const char* filename, char* data, off_t dsize);
+int addFileToFileSystem(struct fs *system, const char* filename, char* data, size_t dsize);
 
 
 /**

@@ -8,6 +8,7 @@
 #include "addons.h"
 #include <limits.h>
 #include <string.h>
+#include <sys/stat.h>
 
 #define UNUSED(x) (void)(x)
 
@@ -36,7 +37,7 @@ int createPackage(const char *root, const char *out, struct sarray *mountpoints)
   while((cursor = sarray_getNextString(mountpoints, cursor)) != NULL) {
     char *src = NULL, *dst = NULL;
 
-    if(splitOnce(cursor, strlen(cursor), &src, &dst, MOUNTPOINT_DIRECTION_SEPARATOR) == -1) {
+    if(splitOnce(cursor, strlen(cursor), &src, &dst, MOUNTPOINT_DIRECTION_SEPARATOR, false) == -1) {
       printf("An error occured while adding mountpoint!\n");
       unLoadFileSystem(system);
       free(exe_name);
@@ -92,16 +93,20 @@ int extractPackage(const char *out_dir) {
   char *data = NULL;
   struct fs *system = NULL;
 
-  dsize = getEmbeddedDataSize(NULL);
+  char *exe_name = getExecutableName();
+
+  dsize = getEmbeddedDataSize(exe_name);
   if(dsize == 0) {
+    free(exe_name);
     printf("Nothing to extract.\n");
     return -1;
   }
-  data = getEmbeddedData(NULL);
+  data = getEmbeddedData(exe_name);
   system = loadFileSystemFromData(data);
   dumpFileSystem(system, out_dir);
 
   unLoadFileSystem(system);
+  free(exe_name);
   free(data);
   return 0;
 }
@@ -144,9 +149,11 @@ int main(int argc, char *const *argv) {
 
   const char *mkdtemp_template = "/tmp/easypack_";
 
+  char *name = getExecutableName();
 
   uint32_t dsize = 0;
-  dsize = getEmbeddedDataSize(NULL);
+  dsize = getEmbeddedDataSize(name);
+  free(name);
   if(dsize > 0) {
     if(out == NULL) {
       out = make_temp_directory(mkdtemp_template);

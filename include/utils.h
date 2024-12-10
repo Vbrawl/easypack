@@ -1,20 +1,69 @@
 #ifndef EASYPACK_UTILS_H
 #define EASYPACK_UTILS_H
 
-#include <sys/stat.h>
 #include "string_array.h"
+#include <stdbool.h>
+
+#ifdef _WIN32
+
+typedef int mode_t;
+#define DT_DIR 1
+#define DT_REG 2
+
+#else
+#include <sys/types.h>
+#include <dirent.h>
+#endif
+
+/**
+ * A polyfill for memrchr
+ *
+ * @param[in] s     The string to search in
+ * @param[in] c     The character to search for
+ * @param[in] n     The length of the string
+ *
+ * @returns A pointer to the character found on success, NULL on failure
+ */
+void* memchr_reverse(const void *s, int c, size_t n);
+
+/**
+ * Get the size of a file
+ *
+ * @param[in] name    The name of the file to get the size
+ *
+ * @returns The size of the file on success, (size_t)-1 on failure.
+ */
+size_t getFileSize(const char *name);
+
+/**
+ * Get current working directory
+ *
+ * @note The caller is responsible for `free`ing the returned pointer.
+ *
+ * @returns A pointer to the CWD on success, NULL on failure.
+ */
+char* getCurrentWorkingDirectory();
+
+/**
+ * Create a directory
+ *
+ * @param[in] path      The directory path
+ *
+ * @retval 0  Succeeded
+ * @retval -1 Failed
+ */
+int makeDirectory(const char *path);
 
 /**
  * Recursively create directories.
  *
  * @param[in] path      The path of directories to create
  * @param[in] pathsize  The size of path parameter
- * @param[in] mode      The mode to use to create the new directories
  *
  * @retval 0  Succeeded
  * @retval -1 Failed
  */
-int makedirs(const char *path, size_t pathsize, mode_t mode);
+int makedirs(const char *path, size_t pathsize);
 
 /**
  * List all items of a specific type inside a specific directory
@@ -72,10 +121,10 @@ char* make_temp_directory(const char *template);
  * @param[out] part1    An address to a char* variable to return first part
  * @param[out] part2    An address to a char* variable to return second part
  * @param[in] separator The separator
+ * @param[in] reverse   Wether to search in normal or reverse order
  *
  * @retval 0  Succeeded
  * @retval -1 Failed
  */
-int splitOnce(const char *data, size_t dsize, char **part1, char **part2, char separator);
-
+int splitOnce(const char *data, size_t dsize, char **part1, char **part2, char separator, bool reverse);
 #endif

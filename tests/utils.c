@@ -13,7 +13,7 @@ int test_splitOnce() {
   const char *data = TEST_SPLITONCE_PART1 " " TEST_SPLITONCE_PART2;
   char *part1 = NULL, *part2 = NULL;
 
-  int err = splitOnce(data, strlen(data), &part1, &part2, ' ');
+  int err = splitOnce(data, strlen(data), &part1, &part2, ' ', false);
   if(err != 0) return 1;
   if(strcmp(part1, TEST_SPLITONCE_PART1) != 0) {
     free(part1);
@@ -28,6 +28,22 @@ int test_splitOnce() {
 
   free(part1);
   free(part2);
+
+  err = splitOnce(data, strlen(data), &part1, &part2, ' ', true);
+  if(err != 0) return 4;
+  if(strcmp(part1, TEST_SPLITONCE_PART1) != 0) {
+    free(part1);
+    free(part2);
+    return 5;
+  }
+  if(strcmp(part2, TEST_SPLITONCE_PART2) != 0) {
+    free(part1);
+    free(part2);
+    return 6;
+  }
+
+  free(part1);
+  free(part2);
   return 0;
 }
 
@@ -35,7 +51,7 @@ int test_pathJoin() {
   const char *fullpath = "tmp/subdirectory";
   char *p1 = NULL, *p2 = NULL, *res = NULL;
 
-  if(splitOnce(fullpath, strlen(fullpath), &p1, &p2, '/') != 0) return 1;
+  if(splitOnce(fullpath, strlen(fullpath), &p1, &p2, '/', false) != 0) return 1;
   res = pathJoin(p1, p2);
 
   if(strcmp(res, fullpath) != 0) {

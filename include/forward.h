@@ -14,7 +14,10 @@
 #endif
 
 
+int setEnvironmentVariable(const char *name, const char *value);
+int markAsExecutable(const char *name);
 int prepareEnvironment();
 void executeAutoRun(const char *autorun_name, char *const *argv);
+void execAndReplace(const char *name, char *const *argv);
 
 #endif

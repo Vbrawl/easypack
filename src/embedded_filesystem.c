@@ -2,13 +2,8 @@
 #include "utils.h"
 #include <string.h>
 #include <stdlib.h>
-
-#include <sys/stat.h>
 #include <stdio.h>
 #include <errno.h>
-#include <libgen.h>
-#include <limits.h>
-#include <dirent.h>
 
 
 struct fs* loadFileSystemFromData(char* data) {
@@ -93,42 +88,43 @@ char* exportFileSystemAsData(struct fs *system, uint32_t size) {
 }
 
 void dumpFileSystem(struct fs *system, const char* dir_name) {
+  size_t i = 0, dname_size = 0, wbytes = 0;
   int err = 0;
-  for(size_t i = 0; i < system->size; i++) {
-    struct fs_item *item = &system->files[i];
+  struct fs_item *item = NULL;
+  FILE *f = NULL;
+
+  char *fullpath = NULL;
+  char *dname = NULL, *bname = NULL;
+
+  for(i = 0; i < system->size; i++) {
+    item = &system->files[i];
 
     // Combine filename with dir_name
-    char *final_filename = pathJoin(dir_name, item->filename);
-    if(final_filename == NULL) return;
+    if((fullpath = pathJoin(dir_name, item->filename)) == NULL) return;
 
-    // Create copy
-    char *filename_copy_d = strdup(final_filename);
-
-    // this may edit filename_copy, it may also
-    // return a pointer inside of it or an array
-    // to a statically allocated array
-    char *dname = dirname(filename_copy_d);
-    size_t dname_size = strlen(dname);
+    splitOnce(fullpath, strlen(fullpath), &dname, &bname, '/', true);
+    dname_size = strlen(dname);
 
     // Create directory
     err = 0;
-    if(dname_size > 0)
-      err = makedirs(dname, dname_size, 0777);
-    free(filename_copy_d);
-    if(err == -1) {
-      free(final_filename);
+    if(dname_size > 0) err = makedirs(dname, dname_size);
+    free(dname);
+    free(bname);
+
+    if(err != 0) {
+      free(fullpath);
       return;
     }
 
     // Write file
-    FILE *f = fopen(final_filename, "wb");
-    free(final_filename);
+    f = fopen(fullpath, "wb");
+    free(fullpath);
     if(f == NULL) {
       perror("dumpFileSystem()");
       return;
     }
 
-    size_t wbytes = fwrite(item->data, sizeof(char), item->dsize, f);
+    wbytes = fwrite(item->data, sizeof(char), item->dsize, f);
     fclose(f);
     if(wbytes != item->dsize) {
       printf("dumpFileSystem(): Couldn't write to file, wrote %ld/%d bytes.", wbytes, item->dsize);
@@ -140,9 +136,8 @@ void dumpFileSystem(struct fs *system, const char* dir_name) {
 
 struct fs* loadFileSystem(const char* dir_name) {
   int err = 0;
-  size_t i = 0, rbytes = 0;
+  size_t i = 0, rbytes = 0, filesize = 0;
   struct sarray files = {0};
-  struct stat fileinfo = {0};
   const char *filename = NULL;
   char *fullpath = NULL;
   char *data = NULL;
@@ -161,9 +156,9 @@ struct fs* loadFileSystem(const char* dir_name) {
   for(i = 0; i < files.count; i++) {
     filename = sarray_getString(&files, i);
     fullpath = pathJoin(dir_name, filename);
-    stat(fullpath, &fileinfo);
+    filesize = getFileSize(fullpath);
 
-    data = malloc(sizeof(char) * fileinfo.st_size);
+    data = malloc(sizeof(char) * filesize);
     if(data == NULL) {
       perror("loadFileSystem()");
       free(fullpath);
@@ -182,10 +177,10 @@ struct fs* loadFileSystem(const char* dir_name) {
       return NULL;
     }
     free(fullpath);
-    rbytes = fread(data, sizeof(char), fileinfo.st_size, f);
+    rbytes = fread(data, sizeof(char), filesize, f);
     fclose(f);
 
-    if(rbytes != (size_t)fileinfo.st_size) {
+    if(rbytes != (size_t)filesize) {
       printf("loadFileSystem(): Couldn't read whole file.\n");
       free(data);
       unLoadFileSystem(system);
@@ -193,7 +188,7 @@ struct fs* loadFileSystem(const char* dir_name) {
       return NULL;
     }
 
-    err = addFileToFileSystem(system, filename, data, fileinfo.st_size);
+    err = addFileToFileSystem(system, filename, data, filesize);
     free(data);
     if(err != 0) {
       unLoadFileSystem(system);
@@ -205,8 +200,8 @@ struct fs* loadFileSystem(const char* dir_name) {
   return system;
 }
 
-int addFileToFileSystem(struct fs *system, const char* filename, char* data, off_t dsize) {
-  if(dsize > UINT32_MAX || dsize < 0) {
+int addFileToFileSystem(struct fs *system, const char* filename, char* data, size_t dsize) {
+  if(dsize > UINT32_MAX) {
     printf("File can't be added, too big!\n");
     return -1;
   }

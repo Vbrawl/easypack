@@ -18,18 +18,20 @@ char* getExecutableName();
  *
  * see Documentation/EXECUTABLE_STRUCTURE.md
  *
- * @param exe_name Executable's name or NULL for automatic resolution
+ * @param exe_name Executable's name
  *
  * @returns Embedded data size
  */
-uint32_t getEmbeddedDataSize(char* exe_name);
+uint32_t getEmbeddedDataSize(const char* exe_name);
 
 /**
  * Get size of the executable
  *
+ * @param[in] exe_name  The executable's name
+ *
  * @returns The size of the executable on success, NULL on failure.
  */
-uint32_t getExecutableSize();
+uint32_t getExecutableSize(const char *exe_name);
 
 
 /**
@@ -39,7 +41,7 @@ uint32_t getExecutableSize();
  *
  * @returns A pointer to the embedded executable's data.
  */
-char* getEmbeddedData(char* exe_name);
+char* getEmbeddedData(const char* exe_name);
 
 /**
  * Embbed additional data on an executable

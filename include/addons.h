@@ -17,6 +17,6 @@ union AddonSymbol {
 };
 
 int executeAddons(struct fs *system);
-
+int executeSingleAddon(const char *name, struct fs *system);
 
 #endif
