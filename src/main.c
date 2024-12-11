@@ -7,6 +7,10 @@
 #include "addons.h"
 #include <string.h>
 
+#ifndef _WIN32
+#include <unistd.h>
+#endif
+
 #define UNUSED(x) (void)(x)
 
 #define ENV_EASYPACK_ROOT         "EASYPACK_ROOT"

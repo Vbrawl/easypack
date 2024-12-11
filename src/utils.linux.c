@@ -7,6 +7,7 @@
 #include <string.h>
 #include <stdio.h>
 #include <errno.h>
+#include <stdlib.h>
 
 size_t getFileSize(const char *name) {
   struct stat s = {0};

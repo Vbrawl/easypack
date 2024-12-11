@@ -26,7 +26,9 @@
 
 char* strndup(const char* s, size_t n);
 #else
+
 #define API
+#include <unistd.h>
 #include <sys/types.h>
 #include <dirent.h>
 
