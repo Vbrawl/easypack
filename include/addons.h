@@ -1,6 +1,12 @@
 #ifndef EASYPACK_ADDONS_H
 #define EASYPACK_ADDONS_H
 
+#ifdef _WIN32
+#define API __declspec(dllexport)
+#else
+#define API
+#endif
+
 #ifndef ENV_EASYPACK_ADDONS
 #define ENV_EASYPACK_ADDONS "EASYPACK_ADDONS"
 #endif
@@ -16,7 +22,7 @@ union AddonSymbol {
   int (*Fexecute)(struct fs*);
 };
 
-int executeAddons(struct fs *system);
-int executeSingleAddon(const char *name, struct fs *system);
+API int executeAddons(struct fs *system);
+API int executeSingleAddon(const char *name, struct fs *system);
 
 #endif

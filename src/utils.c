@@ -4,6 +4,12 @@
 #include <stdlib.h>
 #include <errno.h>
 
+int checkFileExists(const char* name) {
+  if (access(name, F_OK) == 0)
+    return 0;
+  return -1;
+}
+
 // Avoid memrchr not being available
 void* memchr_reverse(const void *s, int c, size_t n) {
   for(const char *cursor = ((const char*)s) + n; cursor >= (const char*)s; cursor--) {
@@ -63,7 +69,7 @@ char* pathJoin(const char *p1, const char *p2) {
   // Get expected size of the result (with optimizations)
   if(p1 == NULL) result_size = strlen(p2);
   else if(p2 == NULL) result_size = strlen(p1);
-  else result_size = snprintf(NULL, 0, "%s/%s", p1, p2);
+  else result_size = snprintf(NULL, 0, "%s" PLATFORM_PATH_SEPARATOR "%s", p1, p2);
 
   // Allocate memory for result
   result = malloc(result_size + 1);
@@ -72,7 +78,7 @@ char* pathJoin(const char *p1, const char *p2) {
   // Construct result's value
   if(p1 == NULL) memcpy(result, p2, result_size);
   else if(p2 == NULL) memcpy(result, p1, result_size);
-  else snprintf(result, result_size + 1, "%s/%s", p1, p2);
+  else snprintf(result, result_size + 1, "%s" PLATFORM_PATH_SEPARATOR "%s", p1, p2);
 
   result[result_size] = '\0';
   return result;
@@ -142,25 +148,6 @@ int walkDirectory(const char *root, const char *vroot, struct sarray *arr) {
   }
 
   return 0;
-}
-
-char* make_temp_directory(const char *template) {
-  size_t template_len = strlen(template);
-  size_t X_append = 6;
-
-  char *malloc_template = malloc(template_len + X_append + 1);
-  if(malloc_template == NULL) return NULL;
-  memcpy(malloc_template, template, template_len);
-  memset(malloc_template + template_len, 'X', X_append);
-  malloc_template[template_len + X_append] = '\0';
-
-  if(mkdtemp(malloc_template) == NULL) {
-    perror("mkdtemp");
-    free(malloc_template);
-    return NULL;
-  }
-
-  return malloc_template;
 }
 
 int splitOnce(const char *data, size_t dsize, char **part1, char **part2, char separator, bool reverse) {

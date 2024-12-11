@@ -4,6 +4,18 @@
 #include <stdint.h>
 #define MAX_FILENAME_SIZE 1024
 
+#ifdef _WIN32
+
+#ifdef EXPORT_API
+#define API __declspec(dllexport)
+#else
+#define API __declspec(dllimport)
+#endif
+
+#else
+#define API
+#endif
+
 /**
  * Get the name of this program's executable.
  *
@@ -11,7 +23,7 @@
  *
  * @returns A pointer to a string containing the executable's name, or NULL on failure.
  */
-char* getExecutableName();
+API char* getExecutableName();
 
 /**
  * Get size of the embedded data
@@ -22,7 +34,7 @@ char* getExecutableName();
  *
  * @returns Embedded data size
  */
-uint32_t getEmbeddedDataSize(const char* exe_name);
+API uint32_t getEmbeddedDataSize(const char* exe_name);
 
 /**
  * Get size of the executable
@@ -31,7 +43,7 @@ uint32_t getEmbeddedDataSize(const char* exe_name);
  *
  * @returns The size of the executable on success, NULL on failure.
  */
-uint32_t getExecutableSize(const char *exe_name);
+API uint32_t getExecutableSize(const char *exe_name);
 
 
 /**
@@ -41,7 +53,7 @@ uint32_t getExecutableSize(const char *exe_name);
  *
  * @returns A pointer to the embedded executable's data.
  */
-char* getEmbeddedData(const char* exe_name);
+API char* getEmbeddedData(const char* exe_name);
 
 /**
  * Embbed additional data on an executable
@@ -51,7 +63,7 @@ char* getEmbeddedData(const char* exe_name);
  * @param[in] data          The data to embbed to the output executable file
  * @param[in] dsize         The data size
  */
-void setEmbeddedData(const char* exe_name, const char* new_exe_name, char* data, uint32_t dsize);
+API void setEmbeddedData(const char* exe_name, const char* new_exe_name, char* data, uint32_t dsize);
 
 
 #endif

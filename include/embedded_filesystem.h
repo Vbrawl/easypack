@@ -4,6 +4,18 @@
 #include <stdint.h>
 #include <stddef.h>
 
+#ifdef _WIN32
+
+#ifdef EXPORT_API
+#define API __declspec(dllexport)
+#else
+#define API __declspec(dllimport)
+#endif
+
+#else
+#define API
+#endif
+
 /**
  * Embedded Filesystem item
  *
@@ -35,7 +47,7 @@ struct fs {
  *
  * @returns The structure generated from data
  */
-struct fs* loadFileSystemFromData(char* data);
+API struct fs* loadFileSystemFromData(char* data);
 
 /**
  * Calculate the length of the serialized format of the filesystem.
@@ -44,7 +56,7 @@ struct fs* loadFileSystemFromData(char* data);
  *
  * @returns The length of the serialized data.
  */
-uint32_t calculateFileSystemAsDataLength(struct fs *system);
+API uint32_t calculateFileSystemAsDataLength(struct fs *system);
 
 /**
  * Get the serialized version of the filesystem.
@@ -57,14 +69,14 @@ uint32_t calculateFileSystemAsDataLength(struct fs *system);
  * @returns A pointer to the serialized data.
  *
  */
-char* exportFileSystemAsData(struct fs *system, uint32_t size);
+API char* exportFileSystemAsData(struct fs *system, uint32_t size);
 
 /**
  * Unload a filesystem and clear all memory allocations.
  *
  * @param[in, out] system Clear the given filesystem.
  */
-void unLoadFileSystem(struct fs *system);
+API void unLoadFileSystem(struct fs *system);
 
 /**
  * Dump the embedded filesystem to the real filesystem of the OS
@@ -72,7 +84,7 @@ void unLoadFileSystem(struct fs *system);
  * @param[in] system    The filesystem to dump
  * @param[in] dir_name  The directory to dump all contents in
  */
-void dumpFileSystem(struct fs *system, const char* dir_name);
+API void dumpFileSystem(struct fs *system, const char* dir_name);
 
 /**
  * Load a real filesystem as an embedded one
@@ -83,7 +95,7 @@ void dumpFileSystem(struct fs *system, const char* dir_name);
  *
  * @returns The loaded embedded filesystem
  */
-struct fs* loadFileSystem(const char* dir_name);
+API struct fs* loadFileSystem(const char* dir_name);
 
 /**
  * Add a file to the embedded filesystem
@@ -96,7 +108,7 @@ struct fs* loadFileSystem(const char* dir_name);
  * @retval 0  Succeeded
  * @retval -1 Failed
  */
-int addFileToFileSystem(struct fs *system, const char* filename, char* data, size_t dsize);
+API int addFileToFileSystem(struct fs *system, const char* filename, char* data, size_t dsize);
 
 
 /**
@@ -109,6 +121,6 @@ int addFileToFileSystem(struct fs *system, const char* filename, char* data, siz
  * @retval 0  Succeeded
  * @retval -1 Failed
  */
-int extendFileSystem(struct fs *system, struct fs *other, const char *vroot);
+API int extendFileSystem(struct fs *system, struct fs *other, const char *vroot);
 
 #endif

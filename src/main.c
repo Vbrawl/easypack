@@ -2,13 +2,10 @@
 #include "file_sections.h"
 #include "embedded_filesystem.h"
 #include <stdlib.h>
-#include <unistd.h>
 #include "utils.h"
 #include "forward.h"
 #include "addons.h"
-#include <limits.h>
 #include <string.h>
-#include <sys/stat.h>
 
 #define UNUSED(x) (void)(x)
 
@@ -78,8 +75,7 @@ int createPackage(const char *root, const char *out, struct sarray *mountpoints)
 
   // Export the package
   setEmbeddedData(exe_name, out, system_data, system_size);
-
-  chmod(out, S_IWUSR | S_IRUSR | S_IXUSR | S_IXGRP | S_IXOTH);
+  markAsExecutable(out);
 
   // Clean everything
   free(system_data);
@@ -98,7 +94,6 @@ int extractPackage(const char *out_dir) {
   dsize = getEmbeddedDataSize(exe_name);
   if(dsize == 0) {
     free(exe_name);
-    printf("Nothing to extract.\n");
     return -1;
   }
   data = getEmbeddedData(exe_name);
@@ -117,24 +112,36 @@ int extractPackage(const char *out_dir) {
  * @retval -2 Failed is changed
  */
 int extractPackageAndAutoRun(const char *out_dir, char *const *argv) {
-  char prev_path[PATH_MAX];
   int error = 0;
 
-  if(getcwd(prev_path, PATH_MAX) == NULL) return -1;
-  if(prepareEnvironment() != 0) return -1;
+  char *prev_path = getCurrentWorkingDirectory();
+  if(prev_path == NULL) return -1;
+
+  if(prepareEnvironment() != 0) {
+    free(prev_path);
+    return -1;
+  }
 
   error = extractPackage(out_dir);
-  if(error != 0) return -1;
+  if(error != 0) {
+    free(prev_path);
+    return -1;
+  }
 
   error = chdir(out_dir);
-  if(error != 0) return -1;
+  if(error != 0) {
+    free(prev_path);
+    return -1;
+  }
 
-  if(access(EASYPACK_AUTORUN_NAME, F_OK) == 0) {
+  if(checkFileExists(EASYPACK_AUTORUN_NAME) == 0) {
     executeAutoRun(EASYPACK_AUTORUN_NAME, argv);
     error = chdir(prev_path);
+    free(prev_path);
     if(error != 0) return -2;
     return -1;
   }
+  free(prev_path);
   return 0;
 }
 
@@ -159,7 +166,7 @@ int main(int argc, char *const *argv) {
       out = make_temp_directory(mkdtemp_template);
       if(out == NULL) return -1;
     }
-    extractPackageAndAutoRun(out, argv);
+    return extractPackageAndAutoRun(out, argv);
   }
   else {
     if(root == NULL) {
@@ -179,7 +186,7 @@ int main(int argc, char *const *argv) {
       }
     }
 
-    createPackage(root, out, &mountpoints);
+    return createPackage(root, out, &mountpoints);
   }
 
   return 0;

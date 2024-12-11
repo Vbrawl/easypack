@@ -86,13 +86,17 @@ void setEmbeddedData(const char* exe_name, const char* new_exe_name, char* data,
 
   uint32_t final_size = esize + dsize + sizeof(uint32_t);
   char* final_data = malloc(final_size);
+  if(final_data == NULL) {
+    printf("setEmbeddedData(): Couldn't allocate memory!\n");
+    return;
+  }
 
   // Read exe
-  f = fopen(exe_name, "r");
+  f = fopen(exe_name, "rb");
   rbytes = fread(final_data, sizeof(char), esize, f);
   fclose(f);
   if(rbytes != esize) {
-    printf("setEmbeddedData(): Couldn't read embedded data, %ld/%d bytes read!\n", rbytes, esize);
+    printf("setEmbeddedData(): Couldn't read executable data, %ld/%d bytes read!\n", rbytes, esize);
     free(final_data);
     return;
   }
@@ -102,7 +106,7 @@ void setEmbeddedData(const char* exe_name, const char* new_exe_name, char* data,
   memcpy(final_data + esize + dsize, &dsize, sizeof(dsize));
 
   // Write new exe
-  f = fopen(new_exe_name, "w");
+  f = fopen(new_exe_name, "wb");
   wbytes = fwrite(final_data, sizeof(char), final_size, f);
   fclose(f);
   free(final_data);

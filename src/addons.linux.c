@@ -23,7 +23,7 @@ int executeSingleAddon(const char *name, struct fs *system) {
     return -1;
   }
 
-  sym_execute.Fexecute(system);
+  status = sym_execute.Fexecute(system);
   dlclose(handle);
 
   if(status != 0) return -1;

@@ -3,6 +3,18 @@
 
 #include <stddef.h>
 
+#ifdef _WIN32
+
+#ifdef EXPORT_API
+#define API __declspec(dllexport)
+#else
+#define API __declspec(dllimport)
+#endif
+
+#else
+#define API
+#endif
+
 /**
  * String array
  */
@@ -20,7 +32,7 @@ struct sarray {
  *
  * @returns Pointer to the string inside the sarray's buffer on success, NULL on failure
  */
-char* sarray_getString(struct sarray *this, size_t index);
+API char* sarray_getString(struct sarray *this, size_t index);
 
 /**
  * Get the next string in the array
@@ -30,7 +42,7 @@ char* sarray_getString(struct sarray *this, size_t index);
  *
  * @returns A cursor to the next string on success, NULL on failure
  */
-char* sarray_getNextString(struct sarray *this, char *cursor);
+API char* sarray_getNextString(struct sarray *this, char *cursor);
 
 /**
  * Populate a sarray from the given string.
@@ -42,7 +54,7 @@ char* sarray_getNextString(struct sarray *this, char *cursor);
  * @retval 0  Succeeded
  * @retval -1 Failed
  */
-int sarray_addStringsFromList(struct sarray *this, const char *list, char separator);
+API int sarray_addStringsFromList(struct sarray *this, const char *list, char separator);
 
 /**
  * Extend the internal sarray's buffer by a requested nubmer of bytes
@@ -54,7 +66,7 @@ int sarray_addStringsFromList(struct sarray *this, const char *list, char separa
  * @retval -1 Failed
  *
  */
-int sarray_extendBy(struct sarray *this, size_t additional_size);
+API int sarray_extendBy(struct sarray *this, size_t additional_size);
 
 /**
  * Add a copy of the given string to the sarray
@@ -73,7 +85,7 @@ int sarray_extendBy(struct sarray *this, size_t additional_size);
  * @retval 0  Succeeded
  * @retval -1 Failed
  */
-int sarray_addString(struct sarray *this, const char *string, size_t string_size);
+API int sarray_addString(struct sarray *this, const char *string, size_t string_size);
 
 /**
  * Extend sarray with another sarray
@@ -85,13 +97,13 @@ int sarray_addString(struct sarray *this, const char *string, size_t string_size
  * @retval 0  Succeeded
  * @retval -1 Failed
  */
-int sarray_extendWith(struct sarray *this, struct sarray *other);
+API int sarray_extendWith(struct sarray *this, struct sarray *other);
 
 /**
  * Clear all fields of a sarray and free
  * all allocated memory
  */
-void sarray_clearAll(struct sarray *this);
+API void sarray_clearAll(struct sarray *this);
 
 
 #endif

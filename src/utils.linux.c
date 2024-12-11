@@ -65,3 +65,22 @@ int listDirectory(const char *dirpath, struct sarray *arr, unsigned char type) {
   closedir(d);
   return 0;
 }
+
+char* make_temp_directory(const char* template) {
+  size_t template_len = strlen(template);
+  size_t X_append = 6;
+
+  char* malloc_template = malloc(template_len + X_append + 1);
+  if (malloc_template == NULL) return NULL;
+  memcpy(malloc_template, template, template_len);
+  memset(malloc_template + template_len, 'X', X_append);
+  malloc_template[template_len + X_append] = '\0';
+
+  if (mkdtemp(malloc_template) == NULL) {
+    perror("mkdtemp");
+    free(malloc_template);
+    return NULL;
+  }
+
+  return malloc_template;
+}

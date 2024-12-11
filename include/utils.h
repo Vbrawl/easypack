@@ -6,14 +6,44 @@
 
 #ifdef _WIN32
 
-typedef int mode_t;
-#define DT_DIR 1
-#define DT_REG 2
-
+#ifdef EXPORT_API
+#define API __declspec(dllexport)
 #else
+#define API __declspec(dllimport)
+#endif
+
+#include <windows.h>
+
+#define chdir _chdir
+
+#define DT_DIR FILE_ATTRIBUTE_DIRECTORY
+#define DT_REG 0
+
+#define access _access
+#define F_OK 0
+
+#define PLATFORM_PATH_SEPARATOR "\\"
+
+char* strndup(const char* s, size_t n);
+#else
+#define API
 #include <sys/types.h>
 #include <dirent.h>
+
+#define PLATFORM_PATH_SEPARATOR "/"
 #endif
+
+//API int changeDirectory(const char* path);
+
+/**
+ * Check if a file exists
+ * 
+ * @param[in] name  The filename to check
+ * 
+ * @retval 0  Succeeded
+ * @retval -1 Failed
+ */
+API int checkFileExists(const char *name);
 
 /**
  * A polyfill for memrchr
@@ -24,7 +54,7 @@ typedef int mode_t;
  *
  * @returns A pointer to the character found on success, NULL on failure
  */
-void* memchr_reverse(const void *s, int c, size_t n);
+API void* memchr_reverse(const void *s, int c, size_t n);
 
 /**
  * Get the size of a file
@@ -33,7 +63,7 @@ void* memchr_reverse(const void *s, int c, size_t n);
  *
  * @returns The size of the file on success, (size_t)-1 on failure.
  */
-size_t getFileSize(const char *name);
+API size_t getFileSize(const char *name);
 
 /**
  * Get current working directory
@@ -42,7 +72,7 @@ size_t getFileSize(const char *name);
  *
  * @returns A pointer to the CWD on success, NULL on failure.
  */
-char* getCurrentWorkingDirectory();
+API char* getCurrentWorkingDirectory();
 
 /**
  * Create a directory
@@ -52,7 +82,7 @@ char* getCurrentWorkingDirectory();
  * @retval 0  Succeeded
  * @retval -1 Failed
  */
-int makeDirectory(const char *path);
+API int makeDirectory(const char *path);
 
 /**
  * Recursively create directories.
@@ -63,7 +93,7 @@ int makeDirectory(const char *path);
  * @retval 0  Succeeded
  * @retval -1 Failed
  */
-int makedirs(const char *path, size_t pathsize);
+API int makedirs(const char *path, size_t pathsize);
 
 /**
  * List all items of a specific type inside a specific directory
@@ -75,7 +105,7 @@ int makedirs(const char *path, size_t pathsize);
  * @retval 0  Succeeded
  * @retval -1 Failed
  */
-int listDirectory(const char *dirpath, struct sarray *arr, unsigned char type);
+API int listDirectory(const char *dirpath, struct sarray *arr, unsigned char type);
 
 /**
  * Join 2 paths together
@@ -85,7 +115,7 @@ int listDirectory(const char *dirpath, struct sarray *arr, unsigned char type);
  *
  * @returns A pointer to the result on success, NULL on failure.
  */
-char* pathJoin(const char *p1, const char *p2);
+API char* pathJoin(const char *p1, const char *p2);
 
 /**
  * Get all files in a directorie's sub-tree
@@ -99,7 +129,7 @@ char* pathJoin(const char *p1, const char *p2);
  * @retval 0  Succeeded
  * @retval -1 Failed
  */
-int walkDirectory(const char *root, const char *vroot, struct sarray *arr);
+API int walkDirectory(const char *root, const char *vroot, struct sarray *arr);
 
 
 /**
@@ -111,7 +141,7 @@ int walkDirectory(const char *root, const char *vroot, struct sarray *arr);
  *
  * @returns A pointer to the actual filename on success, NULL on failure.
  */
-char* make_temp_directory(const char *template);
+API char* make_temp_directory(const char *template);
 
 /**
  * Split data once at the first found separator
@@ -126,5 +156,5 @@ char* make_temp_directory(const char *template);
  * @retval 0  Succeeded
  * @retval -1 Failed
  */
-int splitOnce(const char *data, size_t dsize, char **part1, char **part2, char separator, bool reverse);
+API int splitOnce(const char *data, size_t dsize, char **part1, char **part2, char separator, bool reverse);
 #endif

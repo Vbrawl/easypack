@@ -7,7 +7,11 @@
 
 #define TEST_INCREMENTOR 3
 
+#ifdef _WIN32
+#define TEST_EXECUTABLE_NAME "test_file_sections.exe"
+#else
 #define TEST_EXECUTABLE_NAME "test_file_sections"
+#endif
 
 int test_getExecutableName() {
   char *exe_name = getExecutableName();
@@ -17,6 +21,7 @@ int test_getExecutableName() {
   free(cwd);
 
   if(strcmp(exe_name, res) != 0) {
+    printf("%s == %s\n", exe_name, res);
     free(exe_name);
     free(res);
     return 1;

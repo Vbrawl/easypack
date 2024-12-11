@@ -48,10 +48,10 @@ int test_splitOnce() {
 }
 
 int test_pathJoin() {
-  const char *fullpath = "tmp/subdirectory";
+  const char *fullpath = "tmp" PLATFORM_PATH_SEPARATOR "subdirectory";
   char *p1 = NULL, *p2 = NULL, *res = NULL;
 
-  if(splitOnce(fullpath, strlen(fullpath), &p1, &p2, '/', false) != 0) return 1;
+  if(splitOnce(fullpath, strlen(fullpath), &p1, &p2, PLATFORM_PATH_SEPARATOR[0], false) != 0) return 1;
   res = pathJoin(p1, p2);
 
   if(strcmp(res, fullpath) != 0) {

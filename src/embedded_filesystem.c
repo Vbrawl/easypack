@@ -102,7 +102,7 @@ void dumpFileSystem(struct fs *system, const char* dir_name) {
     // Combine filename with dir_name
     if((fullpath = pathJoin(dir_name, item->filename)) == NULL) return;
 
-    splitOnce(fullpath, strlen(fullpath), &dname, &bname, '/', true);
+    splitOnce(fullpath, strlen(fullpath), &dname, &bname, PLATFORM_PATH_SEPARATOR[0], true);
     dname_size = strlen(dname);
 
     // Create directory
