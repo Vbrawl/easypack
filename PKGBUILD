@@ -6,7 +6,7 @@ pkgdesc=""
 arch=('any')
 url="https://github.com/Vbrawl/easypack"
 license=('MIT')
-options=()
+options=('!debug')
 source=('git+https://github.com/Vbrawl/easypack.git')
 md5sums=('SKIP')
 
