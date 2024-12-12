@@ -22,7 +22,11 @@
 #endif
 
 #ifndef EASYPACK_AUTORUN_NAME
+#ifdef _WIN32
+#define EASYPACK_AUTORUN_NAME "autorun.easypack.bat"
+#else
 #define EASYPACK_AUTORUN_NAME "autorun.easypack"
+#endif
 #endif
 
 

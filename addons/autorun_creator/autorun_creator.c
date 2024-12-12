@@ -1,15 +1,23 @@
 #include <stdio.h>
-#include "easypack_addon.h"
+#include "embedded_filesystem.h"
+#include "forward.h"
 #include "string_array.h"
 #include <string.h>
 #include <stdlib.h>
 
-#define AUTORUN_FILENAME "autorun.easypack"
+#ifdef _WIN32
+#define AUTORUN_DATA \
+"@echo off\n" \
+"set F=%s\n" \
+"set EXECUTABLES=%s\n" \
+"./%%F%%"
+#else
 #define AUTORUN_DATA \
 "#!/bin/sh\n"\
 "F=\"%s\"\n"\
 "chmod +x \"$F\" %s\n"\
 "./$F"
+#endif
 
 #define ENV_AUTORUNCREATOR_FILENAME "ARC_FILE"
 #define ENV_AUTORUNCREATOR_BINARIES "ARC_EXECUTABLES"
@@ -75,7 +83,7 @@ int execute(struct fs *system) {
   snprintf(data, dsize + 1, AUTORUN_DATA, executable, executables_quoted_list);
   data[dsize] = '\0';
 
-  addFileToFileSystem(system, AUTORUN_FILENAME, data, dsize);
+  addFileToFileSystem(system, EASYPACK_AUTORUN_NAME, data, dsize);
   free(data);
   free(executables_quoted_list);
   sarray_clearAll(&executables);
