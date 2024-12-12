@@ -8,9 +8,9 @@
 #ifdef _WIN32
 #define AUTORUN_DATA \
 "@echo off\n" \
-"set F=%s\n" \
-"set EXECUTABLES=%s\n" \
-"./%%F%%"
+"set F=%s\r\n" \
+"set EXECUTABLES=%s\r\n" \
+".\\%%F%% %%*\r\n"
 #else
 #define AUTORUN_DATA \
 "#!/bin/sh\n"\
@@ -52,7 +52,7 @@ char* quotedJoin(struct sarray *list) {
   return data;
 }
 
-int execute(struct fs *system) {
+API int execute(struct fs *system) {
   const char *executable = NULL, *executables_list = NULL;
   struct sarray executables = {0};
   char *data = NULL, *executables_quoted_list = NULL;
