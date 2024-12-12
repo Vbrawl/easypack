@@ -127,7 +127,7 @@ API void dumpFileSystem(struct fs *system, const char* dir_name) {
     wbytes = fwrite(item->data, sizeof(char), item->dsize, f);
     fclose(f);
     if(wbytes != item->dsize) {
-      printf("dumpFileSystem(): Couldn't write to file, wrote %ld/%d bytes.", wbytes, item->dsize);
+      printf("dumpFileSystem(): Couldn't write to file, wrote %zd/%d bytes.", wbytes, item->dsize);
       return;
     }
   }
@@ -217,7 +217,7 @@ API int addFileToFileSystem(struct fs *system, const char* filename, char* data,
   struct fs_item *item = &system->files[system->size++];
 
   // set fsize and filename
-  item->fsize = strlen(filename);
+  item->fsize = (uint32_t)strlen(filename);
   item->filename = malloc(item->fsize + 1);
   memcpy(item->filename, filename, sizeof(char) * item->fsize);
   item->filename[sizeof(char) * item->fsize] = '\0';

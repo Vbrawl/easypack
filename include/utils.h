@@ -8,13 +8,8 @@
 #ifdef _WIN32
 #include <windows.h>
 
-#define chdir _chdir
-
 #define DT_DIR FILE_ATTRIBUTE_DIRECTORY
 #define DT_REG 0
-
-#define access _access
-#define F_OK 0
 
 #define PLATFORM_PATH_SEPARATOR "\\"
 

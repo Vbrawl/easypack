@@ -97,7 +97,7 @@ API char* make_temp_directory(const char* template) {
   memcpy(malloc_template, template, template_len);
   memcpy(malloc_template + template_len, uuid_str, uuid_str_len);
   malloc_template[template_len + uuid_str_len] = '\0';
-  RpcStringFree(uuid_str);
+  RpcStringFree(&uuid_str);
 
   if (CreateDirectory(malloc_template, NULL) == 0 && GetLastError() != ERROR_ALREADY_EXISTS) {
     perror("make_temp_directory");

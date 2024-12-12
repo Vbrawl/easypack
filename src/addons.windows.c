@@ -4,7 +4,7 @@
 
 API int executeSingleAddon(const char *name, struct fs *system) {
   HMODULE handle;
-  const char *error_message = NULL;
+  DWORD error_message = 0;
   union AddonSymbol sym_execute;
   int status = 0;
 

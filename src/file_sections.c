@@ -29,10 +29,10 @@ API uint32_t getEmbeddedDataSize(const char* exe_name) {
   }
 
   // Read last 4 bytes
-  fseek(f, -sizeof(uint32_t), SEEK_END);
+  fseek(f, -((long long)sizeof(uint32_t)), SEEK_END);
   rbytes = fread(&results, sizeof(uint32_t), 1, f);
   if(rbytes != 1) {
-    printf("getEmbeddedDataSize(): Couldn't read embedded size, only %ld bytes read!\n", rbytes);
+    printf("getEmbeddedDataSize(): Couldn't read embedded size, only %zd bytes read!\n", rbytes);
     return 0;
   }
 
@@ -64,10 +64,10 @@ API char* getEmbeddedData(const char* exe_name) {
     return NULL;
   }
 
-  fseek(f, -(data_size + sizeof(uint32_t)), SEEK_END);
+  fseek(f, -(data_size + (long long)sizeof(uint32_t)), SEEK_END);
   rbytes = fread(data, sizeof(char), data_size, f);
   if(rbytes != data_size) {
-    printf("getEmbeddedData(): Couldn't read embedded data, %ld/%d bytes read!\n", rbytes, data_size);
+    printf("getEmbeddedData(): Couldn't read embedded data, %zd/%d bytes read!\n", rbytes, data_size);
     free(data);
     return NULL;
   }
@@ -96,7 +96,7 @@ API void setEmbeddedData(const char* exe_name, const char* new_exe_name, char* d
   rbytes = fread(final_data, sizeof(char), esize, f);
   fclose(f);
   if(rbytes != esize) {
-    printf("setEmbeddedData(): Couldn't read executable data, %ld/%d bytes read!\n", rbytes, esize);
+    printf("setEmbeddedData(): Couldn't read executable data, %zd/%d bytes read!\n", rbytes, esize);
     free(final_data);
     return;
   }
@@ -111,7 +111,7 @@ API void setEmbeddedData(const char* exe_name, const char* new_exe_name, char* d
   fclose(f);
   free(final_data);
   if(wbytes != final_size) {
-    printf("setEmbeddedData(): Couldn't rewrite the exe file, %ld/%d bytes written!\n", wbytes, final_size);
+    printf("setEmbeddedData(): Couldn't rewrite the exe file, %zd/%d bytes written!\n", wbytes, final_size);
     return;
   }
 }

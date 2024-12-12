@@ -40,7 +40,7 @@ API void execAndReplace(const char* name, char* const* argv) {
       &pi) == 0) {
     printf("execAndReplace(): %lu\n", GetLastError());
     free(new_cmdline);
-    return -1;
+    return;
   }
   free(new_cmdline);
 
