@@ -167,7 +167,7 @@ struct fs* loadFileSystem(const char* dir_name) {
       return NULL;
     }
 
-    f = fopen(fullpath, "r");
+    f = fopen(fullpath, "rb");
     if(f == NULL) {
       perror("loadFileSystem()");
       free(data);
