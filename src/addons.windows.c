@@ -2,7 +2,7 @@
 #include <windows.h>
 #include <stdio.h>
 
-int executeSingleAddon(const char *name, struct fs *system) {
+API int executeSingleAddon(const char *name, struct fs *system) {
   HMODULE handle;
   const char *error_message = NULL;
   union AddonSymbol sym_execute;

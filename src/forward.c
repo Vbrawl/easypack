@@ -5,7 +5,7 @@
 #include <stdio.h>
 
 
-int prepareEnvironment() {
+API int prepareEnvironment() {
   char *cwd = NULL, *name = NULL;
 
   if((cwd = getCurrentWorkingDirectory()) == NULL) {
@@ -35,7 +35,7 @@ int prepareEnvironment() {
 }
 
 
-void executeAutoRun(const char *autorun_name, char *const *argv) {
+API void executeAutoRun(const char *autorun_name, char *const *argv) {
   markAsExecutable(autorun_name);
   execAndReplace(autorun_name, argv);
 }

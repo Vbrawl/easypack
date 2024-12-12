@@ -1,11 +1,7 @@
 #ifndef EASYPACK_ADDONS_H
 #define EASYPACK_ADDONS_H
 
-#ifdef _WIN32
-#define API __declspec(dllexport)
-#else
-#define API
-#endif
+#include "compatibility-layer.h"
 
 #ifndef ENV_EASYPACK_ADDONS
 #define ENV_EASYPACK_ADDONS "EASYPACK_ADDONS"

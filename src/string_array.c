@@ -4,7 +4,7 @@
 #include <stdio.h>
 
 
-char* sarray_getString(struct sarray *this, size_t index) {
+API char* sarray_getString(struct sarray *this, size_t index) {
   // Check if index exists
   if(index >= this->count) return NULL;
   char *cursor = this->values;
@@ -19,7 +19,7 @@ char* sarray_getString(struct sarray *this, size_t index) {
   return cursor;
 }
 
-char* sarray_getNextString(struct sarray *this, char *cursor) {
+API char* sarray_getNextString(struct sarray *this, char *cursor) {
   if(cursor == NULL) return this->values;
 
   size_t cursor_offset = cursor - this->values;
@@ -31,7 +31,7 @@ char* sarray_getNextString(struct sarray *this, char *cursor) {
   return cursor;
 }
 
-int __sarray_addStringFromPointers(struct sarray *this, const char *start, size_t len) {
+API int __sarray_addStringFromPointers(struct sarray *this, const char *start, size_t len) {
   char *buf = NULL;
   int err = 0;
 
@@ -51,7 +51,7 @@ int __sarray_addStringFromPointers(struct sarray *this, const char *start, size_
   else          return -1;
 }
 
-int sarray_addStringsFromList(struct sarray *this, const char *list, char separator) {
+API int sarray_addStringsFromList(struct sarray *this, const char *list, char separator) {
   const char *start, *end, *list_end;
   size_t string_len = 0;
   int err = 0;
@@ -78,7 +78,7 @@ int sarray_addStringsFromList(struct sarray *this, const char *list, char separa
   return 0;
 }
 
-int sarray_extendBy(struct sarray *this, size_t additional_size) {
+API int sarray_extendBy(struct sarray *this, size_t additional_size) {
   char *temp = realloc(this->values, this->buf_size + additional_size);
   if(temp == NULL) return -1;
 
@@ -87,7 +87,7 @@ int sarray_extendBy(struct sarray *this, size_t additional_size) {
   return 0;
 }
 
-int sarray_addString(struct sarray *this, const char *string, size_t string_size) {
+API int sarray_addString(struct sarray *this, const char *string, size_t string_size) {
   size_t old_buf_size = this->buf_size;
 
   int err = sarray_extendBy(this, string_size + 1);
@@ -100,7 +100,7 @@ int sarray_addString(struct sarray *this, const char *string, size_t string_size
   return 0;
 }
 
-int sarray_extendWith(struct sarray *this, struct sarray *other) {
+API int sarray_extendWith(struct sarray *this, struct sarray *other) {
   size_t old_buf_size = this->buf_size;
   int err = 0;
 
@@ -113,7 +113,7 @@ int sarray_extendWith(struct sarray *this, struct sarray *other) {
   return 0;
 }
 
-void sarray_clearAll(struct sarray *this) {
+API void sarray_clearAll(struct sarray *this) {
   if(this->values) free(this->values);
   this->values = NULL;
   this->count = 0;

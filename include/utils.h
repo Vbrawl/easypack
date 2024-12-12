@@ -1,17 +1,11 @@
 #ifndef EASYPACK_UTILS_H
 #define EASYPACK_UTILS_H
 
+#include "compatibility-layer.h"
 #include "string_array.h"
 #include <stdbool.h>
 
 #ifdef _WIN32
-
-#ifdef EXPORT_API
-#define API __declspec(dllexport)
-#else
-#define API __declspec(dllimport)
-#endif
-
 #include <windows.h>
 
 #define chdir _chdir
@@ -24,7 +18,7 @@
 
 #define PLATFORM_PATH_SEPARATOR "\\"
 
-char* strndup(const char* s, size_t n);
+API char* strndup(const char* s, size_t n);
 #else
 
 #define API

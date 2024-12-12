@@ -2,7 +2,7 @@
 #include <Windows.h>
 #include <stdio.h>
 
-int setEnvironmentVariable(const char* name, const char* value) {
+API int setEnvironmentVariable(const char* name, const char* value) {
   if (SetEnvironmentVariable(name, value) == 0) {
     DWORD error = GetLastError();
     printf("setEnvironment(): %lu\n", error);
@@ -11,11 +11,11 @@ int setEnvironmentVariable(const char* name, const char* value) {
   return 0;
 }
 
-int markAsExecutable(const char* name) {
+API int markAsExecutable(const char* name) {
   return 0; // Nothing to do!
 }
 
-void execAndReplace(const char* name, char* const* argv) {
+API void execAndReplace(const char* name, char* const* argv) {
   // TODO: We need to write a proper parser for generating command lines
   size_t argv0_size = strlen(argv[0]) + 2; // NOTE: argv is always quoted when in cmdline
   char* cmdline = GetCommandLine();

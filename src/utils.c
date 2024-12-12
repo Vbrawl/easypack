@@ -4,21 +4,21 @@
 #include <stdlib.h>
 #include <errno.h>
 
-int checkFileExists(const char* name) {
+API int checkFileExists(const char* name) {
   if (access(name, F_OK) == 0)
     return 0;
   return -1;
 }
 
 // Avoid memrchr not being available
-void* memchr_reverse(const void *s, int c, size_t n) {
+API void* memchr_reverse(const void *s, int c, size_t n) {
   for(const char *cursor = ((const char*)s) + n; cursor >= (const char*)s; cursor--) {
     if(*cursor == (char)c) return (void*)cursor;
   }
   return NULL;
 }
 
-int makedirs(const char *path, size_t pathsize) {
+API int makedirs(const char *path, size_t pathsize) {
   char *my_path = NULL;
   size_t components = 1, pathlen = 0, i = 0;
 
@@ -59,7 +59,7 @@ int makedirs(const char *path, size_t pathsize) {
   return 0;
 }
 
-char* pathJoin(const char *p1, const char *p2) {
+API char* pathJoin(const char *p1, const char *p2) {
   char *result = NULL;
   size_t result_size = 0;
 
@@ -84,7 +84,7 @@ char* pathJoin(const char *p1, const char *p2) {
   return result;
 }
 
-int walkDirectory(const char *root, const char *vroot, struct sarray *arr) {
+API int walkDirectory(const char *root, const char *vroot, struct sarray *arr) {
   /* Prepare and initialize variables */
   sarray_clearAll(arr); // Results array
   struct sarray filenames = {0}; // Temporarily store all filenames of root
@@ -150,7 +150,7 @@ int walkDirectory(const char *root, const char *vroot, struct sarray *arr) {
   return 0;
 }
 
-int splitOnce(const char *data, size_t dsize, char **part1, char **part2, char separator, bool reverse) {
+API int splitOnce(const char *data, size_t dsize, char **part1, char **part2, char separator, bool reverse) {
   size_t p1size = 0, p2size = 0;
   char *separator_at = NULL;
 

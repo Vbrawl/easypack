@@ -2,14 +2,14 @@
 #include <windows.h>
 #include <stdio.h>
 
-char* strndup(const char* s, size_t n) {
+API char* strndup(const char* s, size_t n) {
   char* new_s = malloc(n + 1);
   memcpy(new_s, s, n);
   new_s[n] = '\0';
   return new_s;
 }
 
-size_t getFileSize(const char* name) {
+API size_t getFileSize(const char* name) {
   WIN32_FILE_ATTRIBUTE_DATA info;
   DWORD error = 0;
   size_t result = 0;
@@ -32,7 +32,7 @@ size_t getFileSize(const char* name) {
   return result;
 }
 
-char* getCurrentWorkingDirectory() {
+API char* getCurrentWorkingDirectory() {
   char* data = malloc(MAX_PATH);
   if (data == NULL) return NULL;
 
@@ -45,13 +45,13 @@ char* getCurrentWorkingDirectory() {
   return data;
 }
 
-int makeDirectory(const char* path) {
+API int makeDirectory(const char* path) {
   int err = CreateDirectory(path, NULL);
   if (err == 0 && GetLastError() != ERROR_ALREADY_EXISTS) return -1;
   return 0;
 }
 
-int listDirectory(const char* dirpath, struct sarray* arr, unsigned char type) {
+API int listDirectory(const char* dirpath, struct sarray* arr, unsigned char type) {
   WIN32_FIND_DATA data;
   HANDLE hFind;
 
@@ -83,7 +83,7 @@ int listDirectory(const char* dirpath, struct sarray* arr, unsigned char type) {
   return 0;
 }
 
-char* make_temp_directory(const char* template) {
+API char* make_temp_directory(const char* template) {
   size_t template_len = strlen(template);
   RPC_CSTR uuid_str = NULL;
   size_t uuid_str_len = 0;

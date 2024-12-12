@@ -4,17 +4,7 @@
 #include <stdint.h>
 #define MAX_FILENAME_SIZE 1024
 
-#ifdef _WIN32
-
-#ifdef EXPORT_API
-#define API __declspec(dllexport)
-#else
-#define API __declspec(dllimport)
-#endif
-
-#else
-#define API
-#endif
+#include "compatibility-layer.h"
 
 /**
  * Get the name of this program's executable.

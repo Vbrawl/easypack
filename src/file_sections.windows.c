@@ -3,7 +3,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-char* getExecutableName() {
+API char* getExecutableName() {
   char *name = NULL;
   size_t nsize = 0;
 

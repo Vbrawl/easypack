@@ -7,7 +7,7 @@
 #include <errno.h>
 #include <string.h>
 
-uint32_t getExecutableSize(const char *exe_name) {
+API uint32_t getExecutableSize(const char *exe_name) {
   uint32_t total_size = 0, data_size = 0;
 
   total_size = (uint32_t)getFileSize(exe_name);
@@ -16,7 +16,7 @@ uint32_t getExecutableSize(const char *exe_name) {
   return total_size - data_size - sizeof(data_size);
 }
 
-uint32_t getEmbeddedDataSize(const char* exe_name) {
+API uint32_t getEmbeddedDataSize(const char* exe_name) {
   uint32_t results = 0;
   FILE *f = NULL;
   size_t rbytes = 0;
@@ -41,7 +41,7 @@ uint32_t getEmbeddedDataSize(const char* exe_name) {
   return results;
 }
 
-char* getEmbeddedData(const char* exe_name) {
+API char* getEmbeddedData(const char* exe_name) {
   FILE *f = NULL;
   char* data = NULL;
   size_t rbytes = 0;
@@ -78,7 +78,7 @@ char* getEmbeddedData(const char* exe_name) {
 }
 
 
-void setEmbeddedData(const char* exe_name, const char* new_exe_name, char* data, uint32_t dsize) {
+API void setEmbeddedData(const char* exe_name, const char* new_exe_name, char* data, uint32_t dsize) {
   FILE *f = NULL;
   size_t wbytes = 0, rbytes = 0;
 

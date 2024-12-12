@@ -1,17 +1,7 @@
 #ifndef EASYPACK_FORWARD_H
 #define EASYPACK_FORWARD_H
 
-#ifdef _WIN32
-
-#ifdef EXPORT_API
-#define API __declspec(dllexport)
-#else
-#define API __declspec(dllimport)
-#endif
-
-#else
-#define API
-#endif
+#include "compatibility-layer.h"
 
 #ifndef ENVOUT_EASYPACK_NAME
 #define ENVOUT_EASYPACK_NAME "EASYPACK_NAME"

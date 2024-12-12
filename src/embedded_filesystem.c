@@ -6,7 +6,7 @@
 #include <errno.h>
 
 
-struct fs* loadFileSystemFromData(char* data) {
+API struct fs* loadFileSystemFromData(char* data) {
   struct fs *system = malloc(sizeof(struct fs));
 
   memcpy(&system->size, data, sizeof(system->size));
@@ -35,7 +35,7 @@ struct fs* loadFileSystemFromData(char* data) {
   return system;
 }
 
-void unLoadFileSystem(struct fs *system) {
+API void unLoadFileSystem(struct fs *system) {
   for(uint32_t i = 0; i < system->size; i++) {
     struct fs_item *item = &system->files[i];
     free(item->filename);
@@ -46,7 +46,7 @@ void unLoadFileSystem(struct fs *system) {
   free(system);
 }
 
-uint32_t calculateFileSystemAsDataLength(struct fs *system) {
+API uint32_t calculateFileSystemAsDataLength(struct fs *system) {
   uint32_t size = 0;
 
   // filesystem items number length
@@ -63,7 +63,7 @@ uint32_t calculateFileSystemAsDataLength(struct fs *system) {
   return size;
 }
 
-char* exportFileSystemAsData(struct fs *system, uint32_t size) {
+API char* exportFileSystemAsData(struct fs *system, uint32_t size) {
   char* buf = malloc(sizeof(char) * size);
   char* buf_backup = buf;
 
@@ -87,7 +87,7 @@ char* exportFileSystemAsData(struct fs *system, uint32_t size) {
   return buf_backup;
 }
 
-void dumpFileSystem(struct fs *system, const char* dir_name) {
+API void dumpFileSystem(struct fs *system, const char* dir_name) {
   size_t i = 0, dname_size = 0, wbytes = 0;
   int err = 0;
   struct fs_item *item = NULL;
@@ -134,7 +134,7 @@ void dumpFileSystem(struct fs *system, const char* dir_name) {
 }
 
 
-struct fs* loadFileSystem(const char* dir_name) {
+API struct fs* loadFileSystem(const char* dir_name) {
   int err = 0;
   size_t i = 0, rbytes = 0, filesize = 0;
   struct sarray files = {0};
@@ -200,7 +200,7 @@ struct fs* loadFileSystem(const char* dir_name) {
   return system;
 }
 
-int addFileToFileSystem(struct fs *system, const char* filename, char* data, size_t dsize) {
+API int addFileToFileSystem(struct fs *system, const char* filename, char* data, size_t dsize) {
   if(dsize > UINT32_MAX) {
     printf("File can't be added, too big!\n");
     return -1;
@@ -231,7 +231,7 @@ int addFileToFileSystem(struct fs *system, const char* filename, char* data, siz
 }
 
 
-int extendFileSystem(struct fs *system, struct fs *other, const char *vroot) {
+API int extendFileSystem(struct fs *system, struct fs *other, const char *vroot) {
   size_t i = 0;
   char *fullpath = NULL;
   struct fs_item *cursor = NULL;

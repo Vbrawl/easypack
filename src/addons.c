@@ -3,7 +3,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-int executeAddons(struct fs *system) {
+API int executeAddons(struct fs *system) {
   const char *addon_list = NULL;
   char *cursor = NULL;
   struct sarray addons = {0};
