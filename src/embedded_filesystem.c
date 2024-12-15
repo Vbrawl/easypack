@@ -250,3 +250,28 @@ API int extendFileSystem(struct fs *system, struct fs *other, const char *vroot)
   return 0;
 }
 
+API int removeFileFromFileSystem(struct fs *system, const char *filename) {
+  size_t i = 0;
+  struct fs_item *temp_files = NULL;
+
+  // Find file with filename
+  for(i = 0; i < system->size && strcmp(system->files[i].filename, filename) != 0; i++);
+  if(i > system->size) return -1;
+
+  if(i != system->size)
+    memmove(system->files + i, system->files + i + 1, sizeof(struct fs_item) * (system->size - i));
+
+  system->size -= 1;
+  temp_files = realloc(system->files, sizeof(struct fs_item) * system->size);
+  if(temp_files == NULL) return 0; // This is an ignored error
+  system->files = temp_files;
+
+  return 0;
+}
+
+__attribute__((optimize("O0"))) API struct fs_item* getFileFromFileSystem(struct fs *system, const char *filename) {
+  size_t i = 0;
+  for(i = 0; i < system->size && strcmp(system->files[i].filename, filename) != 0; i++);
+  if(i >= system->size) return NULL;
+  return &system->files[i];
+}

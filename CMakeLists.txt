@@ -17,7 +17,8 @@ set(EASYPACK_SOURCES
   src/utils.c
   src/string_array.c
   src/forward.c
-  src/addons.c)
+  src/addons.c
+  src/dynamic_string.c)
 
 set(OS_SOURCES)
 
@@ -73,6 +74,7 @@ execute_process(
 
 # List addons
 add_subdirectory(addons/autorun_creator)
+add_subdirectory(addons/cli_installer)
 
 # Install instructions
 install(TARGETS easypack RUNTIME DESTINATION bin)
@@ -97,3 +99,4 @@ endmacro()
 TESTCASE(test_string_array tests/string_array.c src/string_array.c src/utils.c ${OS_SOURCES})
 TESTCASE(test_utils tests/utils.c src/utils.c src/string_array.c ${OS_SOURCES})
 TESTCASE(test_file_sections tests/file_sections.c src/file_sections.c src/utils.c src/string_array.c ${OS_SOURCES})
+TESTCASE(test_dynamic_string tests/dynamic_string.c src/dynamic_string.c)

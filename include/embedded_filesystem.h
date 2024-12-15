@@ -113,4 +113,26 @@ API int addFileToFileSystem(struct fs *system, const char* filename, char* data,
  */
 API int extendFileSystem(struct fs *system, struct fs *other, const char *vroot);
 
+/**
+ * Remove a file from a filesystem
+ *
+ * @note Only files can be removed!
+ *
+ * @param[in, out]  system      The filesystem to be updated
+ * @param[in]       filename    The filename to be removed
+ *
+ * @retval 0  Succeeded (memory usage may or may not be decreased)
+ * @retval -1 Failed
+ */
+API int removeFileFromFileSystem(struct fs *system, const char *filename);
+
+
+/**
+ * Get file by name
+ *
+ * @param[in]   system    The filesystem to be queried
+ *
+ * @returns A pointer to the fs_item in the system or NULL on failure
+ */
+API struct fs_item* getFileFromFileSystem(struct fs *system, const char *filename);
 #endif
