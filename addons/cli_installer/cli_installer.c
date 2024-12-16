@@ -16,21 +16,27 @@
 
 #define OS_SCRIPT_HEADER "#!/bin/sh\n"
 
-#define OS_COPY_SCRIPT  "cp -r \"./%s\" \"${EASYPACK_CLIINSTALLER_PREFIX}/%s\"\n"
-#define OS_DELETE_SCRIPT "rm -r \"${EASYPACK_CLIINSTALLER_PREFIX}/%s\"\n"
-#define OS_MARKEXEC_SCRIPT "chmod +x \"${EASYPACK_CLIINSTALLER_PREFIX}/%s\"\n"
-#define OS_EXEC_SCRIPT "\"${EASYPACK_CLIINSTALLER_PREFIX}/%s\"\n"
-#define OS_DIRECTORY_SCRIPT "mkdir -p \"${EASYPACK_CLIINSTALLER_PREFIX}/%s\"\n"
+#define OS_COPY_SCRIPT  "cp -r \"${CLII_PACKAGE}%s\" \"${CLII_PREFIX}%s\"\n"
+#define OS_DELETE_SCRIPT "rm -r \"${CLII_PREFIX}%s\"\n"
+#define OS_MARKEXEC_SCRIPT "chmod +x \"${CLII_PREFIX}%s\"\n"
+#define OS_EXEC_SCRIPT "CLII_OLDPWD=$(pwd) && cd ${CLII_PREFIX} && \"%s\" && cd ${CLII_OLDPWD} && unset CLII_OLDPWD\n"
+#define OS_DIRECTORY_SCRIPT "mkdir -p \"${CLII_PREFIX}%s\"\n"
 #define OS_PRINT_SCRIPT "echo \"%s\"\n"
 
 #define OS_STARTUP_SCRIPT OS_SCRIPT_HEADER \
-                          "chmod +x \"./" CLIINSTALLER_INSTALL_FILENAME "\" 2> /dev/null \n" \
-                          "chmod +x \"./" CLIINSTALLER_UNINSTALL_FILENAME "\" 2> /dev/null\n" \
+                          "export CLII_PREFIX=\"${CLII_PREFIX:=\"\"}/\"\n" \
+                          "export CLII_BINARY=\"bin/\"\n" \
+                          "export CLII_INCLUDE=\"include/\"\n" \
+                          "export CLII_LIBRARY=\"lib/\"\n" \
+                          "export CLII_PACKAGE=\"$(pwd)/\"\n" \
+                          "cd \"${EASYPACK_CWD}\"\n" \
+                          "chmod +x \"${CLII_PACKAGE}" CLIINSTALLER_INSTALL_FILENAME "\" 2> /dev/null \n" \
+                          "chmod +x \"${CLII_PACKAGE}" CLIINSTALLER_UNINSTALL_FILENAME "\" 2> /dev/null\n" \
                           "if [ \"$1\" == \"uninstall\" ]\n" \
                           "then\n" \
-                          "  \"./" CLIINSTALLER_UNINSTALL_FILENAME "\"\n" \
+                          "  \"${CLII_PACKAGE}" CLIINSTALLER_UNINSTALL_FILENAME "\"\n" \
                           "else\n" \
-                          "  \"./" CLIINSTALLER_INSTALL_FILENAME "\"\n" \
+                          "  \"${CLII_PACKAGE}" CLIINSTALLER_INSTALL_FILENAME "\"\n" \
                           "fi\n"
 #endif
 
@@ -243,7 +249,7 @@ int transpile_file(struct fs *system, const char *filename) {
   return 0;
 }
 
-__attribute__((optimize("00"))) int execute(struct fs *system) {
+int execute(struct fs *system) {
   int transpiled = 0;
 
   if(transpile_file(system, CLIINSTALLER_INSTALL_FILENAME) == 0) {transpiled += 1;}

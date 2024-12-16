@@ -256,9 +256,9 @@ API int removeFileFromFileSystem(struct fs *system, const char *filename) {
 
   // Find file with filename
   for(i = 0; i < system->size && strcmp(system->files[i].filename, filename) != 0; i++);
-  if(i > system->size) return -1;
+  if(i >= system->size) return -1;
 
-  if(i != system->size)
+  if(i != system->size - 1)
     memmove(system->files + i, system->files + i + 1, sizeof(struct fs_item) * (system->size - i));
 
   system->size -= 1;
@@ -269,7 +269,7 @@ API int removeFileFromFileSystem(struct fs *system, const char *filename) {
   return 0;
 }
 
-__attribute__((optimize("O0"))) API struct fs_item* getFileFromFileSystem(struct fs *system, const char *filename) {
+API struct fs_item* getFileFromFileSystem(struct fs *system, const char *filename) {
   size_t i = 0;
   for(i = 0; i < system->size && strcmp(system->files[i].filename, filename) != 0; i++);
   if(i >= system->size) return NULL;
