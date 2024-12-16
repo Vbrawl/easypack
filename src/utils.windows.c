@@ -84,6 +84,14 @@ API int listDirectory(const char* dirpath, struct sarray* arr, unsigned char typ
 }
 
 API char* make_temp_directory(const char* template) {
+  char template_parent[MAX_PATH+1];
+  size_t template_parent_len = 0;
+  if (GetTempPath(MAX_PATH + 1, template_parent) == 0) {
+    DWORD error = GetLastError();
+    printf("make_temp_directory(): %d", error);
+    return NULL;
+  }
+  template_parent_len = strlen(template_parent);
   size_t template_len = strlen(template);
   RPC_CSTR uuid_str = NULL;
   size_t uuid_str_len = 0;
@@ -92,11 +100,12 @@ API char* make_temp_directory(const char* template) {
   UuidToString(&uuid, &uuid_str);
   uuid_str_len = strlen(uuid_str);
 
-  char* malloc_template = malloc(template_len + uuid_str_len + 1);
+  char* malloc_template = malloc(template_parent_len + template_len + uuid_str_len + 1);
   if (malloc_template == NULL) return NULL;
-  memcpy(malloc_template, template, template_len);
-  memcpy(malloc_template + template_len, uuid_str, uuid_str_len);
-  malloc_template[template_len + uuid_str_len] = '\0';
+  memcpy(malloc_template, template_parent, template_parent_len);
+  memcpy(malloc_template + template_parent_len, template, template_len);
+  memcpy(malloc_template + template_parent_len + template_len, uuid_str, uuid_str_len);
+  malloc_template[template_parent_len + template_len + uuid_str_len] = '\0';
   RpcStringFree(&uuid_str);
 
   if (CreateDirectory(malloc_template, NULL) == 0 && GetLastError() != ERROR_ALREADY_EXISTS) {

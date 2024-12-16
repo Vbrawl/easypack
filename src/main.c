@@ -158,7 +158,7 @@ int main(int argc, char *const *argv) {
   struct sarray mountpoints = {0};
   const char *mountpoints_str = getenv(ENV_EASYPACK_MOUNTPOINTS);
 
-  const char *mkdtemp_template = "/tmp/easypack_";
+  const char *mkdtemp_template = OS_MKDTEMP_TEMPLATE;
 
   char *name = getExecutableName();
 

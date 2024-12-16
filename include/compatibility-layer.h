@@ -17,9 +17,13 @@
 
 #define F_OK 0
 
+#define OS_MKDTEMP_TEMPLATE "easypack_"
+
 #else
 
 #define API
+
+#define OS_MKDTEMP_TEMPLATE "/tmp/easypack_"
 
 #endif
 
