@@ -6,20 +6,27 @@
 #include <stdlib.h>
 
 #ifdef _WIN32
+
+#define OS_AUTORUNCREATOR_DEFAULT_INTERPRETER "start /wait"
+
 #define AUTORUN_DATA \
 "@echo off\n" \
 "set F=%s\r\n" \
 "set EXECUTABLES=%s\r\n" \
-".\\%%F%% %%*\r\n"
+"%s %%F%% %%*\r\n"
 #else
+
+#define OS_AUTORUNCREATOR_DEFAULT_INTERPRETER "exec"
+
 #define AUTORUN_DATA \
 "#!/bin/sh\n"\
 "F=\"%s\"\n"\
 "chmod +x \"$F\" %s\n"\
-"./$F"
+"%s $F"
 #endif
 
 #define ENV_AUTORUNCREATOR_FILENAME "ARC_FILE"
+#define ENV_AUTORUNCREATOR_INTERPRETER "ARC_INTERPRETER"
 #define ENV_AUTORUNCREATOR_BINARIES "ARC_EXECUTABLES"
 
 char* quotedJoin(struct sarray *list) {
@@ -53,7 +60,7 @@ char* quotedJoin(struct sarray *list) {
 }
 
 API int execute(struct fs *system) {
-  const char *executable = NULL, *executables_list = NULL;
+  const char *executable = NULL, *executable_interpreter = NULL, *executables_list = NULL;
   struct sarray executables = {0};
   char *data = NULL, *executables_quoted_list = NULL;
   size_t dsize = 0;
@@ -64,6 +71,11 @@ API int execute(struct fs *system) {
     return -1;
   }
 
+  executable_interpreter = getenv(ENV_AUTORUNCREATOR_INTERPRETER);
+  if(executable_interpreter == NULL) {
+    executable_interpreter = OS_AUTORUNCREATOR_DEFAULT_INTERPRETER;
+  }
+
   executables_list = getenv(ENV_AUTORUNCREATOR_BINARIES);
   if(executables_list != 0) {
     if(sarray_addStringsFromList(&executables, executables_list, ',') != 0) {
@@ -72,7 +84,7 @@ API int execute(struct fs *system) {
   }
   executables_quoted_list = quotedJoin(&executables);
 
-  dsize = snprintf(NULL, 0, AUTORUN_DATA, executable, executables_quoted_list);
+  dsize = snprintf(NULL, 0, AUTORUN_DATA, executable, executables_quoted_list, executable_interpreter);
   data = malloc(dsize + 1);
   if(data == NULL) {
     printf("Not enough memory!");
@@ -80,7 +92,7 @@ API int execute(struct fs *system) {
     sarray_clearAll(&executables);
     return -1;
   }
-  snprintf(data, dsize + 1, AUTORUN_DATA, executable, executables_quoted_list);
+  snprintf(data, dsize + 1, AUTORUN_DATA, executable, executables_quoted_list, executable_interpreter);
   data[dsize] = '\0';
 
   addFileToFileSystem(system, EASYPACK_AUTORUN_NAME, data, dsize);
