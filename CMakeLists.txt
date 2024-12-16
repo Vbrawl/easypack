@@ -74,7 +74,6 @@ execute_process(
 
 # List addons
 add_subdirectory(addons/autorun_creator)
-add_subdirectory(addons/cli_installer)
 
 # Install instructions
 install(TARGETS easypack RUNTIME DESTINATION bin)
